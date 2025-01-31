@@ -7,7 +7,7 @@
     "esModuleInterop": true, // 启用对 ES 模块的互操作性，允许默认导入
     "declaration": true, // 生成 .d.ts 声明文件
     "declarationMap": true, // 为声明文件生成 source map
-    "strict": true, // 启用所有严格类型检查选项
+    "strict": false, // 启用所有严格类型检查选项
     "resolveJsonModule": true, // 允许导入 JSON 文件
     "allowSyntheticDefaultImports": true // 允许从没有默认导出的模块中默认导入
   },

@@ -1,37 +1,62 @@
-import { ASTNode } from './ast';
+import IMarkdown from './index';
 
 // 解析器选项接口
 export interface ParserOptions {
-  [key: string]: any;
+  features?: {
+    basic?: {// 基础功能
+      headings?: boolean;
+      textFormatting?: {
+        bold?: boolean;
+        italic?: boolean;
+        strikethrough?: boolean;
+      };
+      lists?: {
+        unordered?: boolean;
+        ordered?: boolean;
+      };
+      media?: {
+        links?: boolean;
+        images?: boolean;
+      };
+      blockquotes?: boolean;
+      horizontalRule?: boolean;
+      tables?: boolean;
+    };
+    extensions?: {// 扩展功能
+      math?: boolean;
+      mermaid?: boolean;
+      footnotes?: boolean;
+      taskLists?: boolean;
+    };
+  };
+  codeBlock?: {//代码块
+    languages?: string[] | 'all';
+    languageAliases?: Record<string, string>;
+  };
+  security?: {//安全
+    allowHtml?: boolean;
+    sanitize?: boolean;
+  };
+  performance?: {//性能优化
+    incrementalUpdates?: boolean;
+    lazyRendering?: boolean;
+  };
 }
 
-// 内容变更接口
-export interface ContentChange {
-  start: number;
-  end: number;
-  newContent: string;
+// getParserInstance 接口
+export default function getParserInstance(options: ParserOptions): IMarkdown {
+  const { features, codeBlock, security, performance } = options;
+
+  // 根据选项动态配置解析器的行为
+  const parserOptions: ParserOptions = {
+    features: features || {},
+    codeBlock: codeBlock || {},
+    security: security || {},
+    performance: performance || {},
+  };
+
+  // 返回新的解析器实例
+  return new IMarkdown(parserOptions);
 }
 
-// 解析结果接口
-export interface ParseResult {
-  html: string;
-  ast: ASTNode;
-}
 
-// IMarkdownParser 接口
-export interface IMarkdownParser {
-  /**
-   * 解析 Markdown 文本为 HTML，并返回解析结果
-   * @param content Markdown 文本内容
-   * @param options 解析配置选项
-   */
-  parse(content: string, options?: ParserOptions): ParseResult;
-
-  /**
-   * 增量解析 Markdown 文本为 HTML，并返回解析结果
-   * @param content Markdown 文本内容
-   * @param changes 内容变更
-   * @param options 解析配置选项
-   */
-  parseIncremental(content: string, changes: ContentChange[], options?: ParserOptions): ParseResult;
-}
