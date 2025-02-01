@@ -1,52 +1,74 @@
 // 主解析器类
 
-import * as utils from './common/utils'
-import Renderer from './renderer'
-import ParserCore from './parser_core'
-import ParserBlock from './parser_block'
-import ParserInline from './parser_inline'
-import { ParserOptions } from './api'
+import * as utils from './common/utils';
+import Renderer from './renderer';
+import ParserCore from './parser_core';
+import ParserBlock from './parser_block';
+import ParserInline from './parser_inline';
+import { ParserOptions } from './api';
 
-export default function IMarkdown (options:ParserOptions) {
-  if (!(this instanceof IMarkdown)) {
-    return new IMarkdown(options)
+export default class IMarkdown {
+  inline: ParserInline;
+  block: ParserBlock;
+  core: ParserCore;
+  renderer: Renderer;
+  options: ParserOptions;
+
+  constructor(options?: ParserOptions) {
+    this.inline = new ParserInline();
+    this.block = new ParserBlock();
+    this.core = new ParserCore();
+    this.renderer = new Renderer();
+
+    this.options = {};
+    if (options) {
+      this.set(options);
+    }
   }
 
-  this.inline = new ParserInline()
-  this.block = new ParserBlock()
-  this.core = new ParserCore()
-  this.renderer = new Renderer()
+  parse(src: string, env: any): any[] {
+    if (typeof src !== 'string') {
+      throw new Error('Input data should be a String');
+    }
 
-  this.options = {}
-  if (options) { this.set(options) }
-}
+    const state = new this.core.State(src, this, env);
 
+    this.core.process(state);
 
-IMarkdown.prototype.set = function (options) {
-  utils.assign(this.options, options)
-  return this
-}
+    return state.tokens;
+  }
 
+  set(options: ParserOptions): this {
+    utils.assign(this.options, options);
+    return this;
+  }
 
-IMarkdown.prototype.enable = function (list) {
-  // 启用规则
-  list.forEach(function (rule) {
-    this.core.enable(rule)
-  }, this)
-  return this
-}
+  enable(list: string[]): this {
+    // 启用规则
+    list.forEach(rule => {
+      this.core.ruler.enable(rule);
+    });
+    return this;
+  }
 
-IMarkdown.prototype.disable = function (list) {
-  // 禁用规则
-  list.forEach(function (rule) {
-    this.core.disable(rule)
-  }, this)
-  return this
-}
+  disable(list: string[]): this {
+    // 禁用规则
+    list.forEach(rule => {
+      this.core.ruler.disable(rule);
+    });
+    return this;
+  }
 
-IMarkdown.prototype.use = function (plugin, params) {
-  plugin(this, params)
-  return this
+  use(plugin: (instance: IMarkdown, params?: any) => void, params?: any): this {
+    plugin(this, params);
+    return this;
+  }
+
+  render(src: string, env?: any): string {
+    env = env || {};
+
+    return this.renderer.render(this.parse(src, env), this.options, env);
+  }
 }
 
 

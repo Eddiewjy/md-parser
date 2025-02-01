@@ -4,43 +4,34 @@ import * as mdurl from 'mdurl'
 import * as ucmicro from 'uc.micro'
 import { decodeHTML } from 'entities'
 
-function _class (obj) { return Object.prototype.toString.call(obj) }
+function _class(obj) { return Object.prototype.toString.call(obj) }
 
-function isString (obj) { return _class(obj) === '[object String]' }
+function isString(obj) { return _class(obj) === '[object String]' }
 
 const _hasOwnProperty = Object.prototype.hasOwnProperty
 
-function has (object, key) {
+function has(object, key) {
   return _hasOwnProperty.call(object, key)
 }
 
 // Merge objects
-//
-function assign (obj /* from1, from2, from3, ... */) {
-  const sources = Array.prototype.slice.call(arguments, 1)
-
-  sources.forEach(function (source) {
-    if (!source) { return }
-
-    if (typeof source !== 'object') {
-      throw new TypeError(source + 'must be object')
+//使用Object.assign优化代码
+function assign(obj: any, ...sources: any[]) {
+  sources.forEach(source => {
+    if (typeof source !== 'object' || source === null) {
+      throw new TypeError(source + ' must be an object')
     }
-
-    Object.keys(source).forEach(function (key) {
-      obj[key] = source[key]
-    })
   })
-
-  return obj
+  return Object.assign(obj, ...sources)
 }
 
 // Remove element from array and put another array at those position.
 // Useful for some operations with tokens
-function arrayReplaceAt (src, pos, newElements) {
-  return [].concat(src.slice(0, pos), newElements, src.slice(pos + 1))
+function arrayReplaceAt(src, pos, newElements) {
+  return [...src.slice(0, pos), ...newElements, ...src.slice(pos + 1)]
 }
 
-function isValidEntityCode (c) {
+function isValidEntityCode(c) {
   /* eslint no-bitwise:0 */
   // broken sequence
   if (c >= 0xD800 && c <= 0xDFFF) { return false }
@@ -57,7 +48,7 @@ function isValidEntityCode (c) {
   return true
 }
 
-function fromCodePoint (c) {
+function fromCodePoint(c) {
   /* eslint no-bitwise:0 */
   if (c > 0xffff) {
     c -= 0x10000
@@ -69,13 +60,13 @@ function fromCodePoint (c) {
   return String.fromCharCode(c)
 }
 
-const UNESCAPE_MD_RE  = /\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g
-const ENTITY_RE       = /&([a-z#][a-z0-9]{1,31});/gi
+const UNESCAPE_MD_RE = /\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g
+const ENTITY_RE = /&([a-z#][a-z0-9]{1,31});/gi
 const UNESCAPE_ALL_RE = new RegExp(UNESCAPE_MD_RE.source + '|' + ENTITY_RE.source, 'gi')
 
 const DIGITAL_ENTITY_TEST_RE = /^#((?:x[a-f0-9]{1,8}|[0-9]{1,8}))$/i
 
-function replaceEntityPattern (match, name) {
+function replaceEntityPattern(match, name) {
   if (name.charCodeAt(0) === 0x23/* # */ && DIGITAL_ENTITY_TEST_RE.test(name)) {
     const code = name[1].toLowerCase() === 'x'
       ? parseInt(name.slice(2), 16)
@@ -96,18 +87,12 @@ function replaceEntityPattern (match, name) {
   return match
 }
 
-/* function replaceEntities(str) {
-  if (str.indexOf('&') < 0) { return str; }
-
-  return str.replace(ENTITY_RE, replaceEntityPattern);
-} */
-
-function unescapeMd (str) {
+function unescapeMd(str) {
   if (str.indexOf('\\') < 0) { return str }
   return str.replace(UNESCAPE_MD_RE, '$1')
 }
 
-function unescapeAll (str) {
+function unescapeAll(str) {
   if (str.indexOf('\\') < 0 && str.indexOf('&') < 0) { return str }
 
   return str.replace(UNESCAPE_ALL_RE, function (match, escaped, entity) {
@@ -125,11 +110,11 @@ const HTML_REPLACEMENTS = {
   '"': '&quot;'
 }
 
-function replaceUnsafeChar (ch) {
+function replaceUnsafeChar(ch) {
   return HTML_REPLACEMENTS[ch]
 }
 
-function escapeHtml (str) {
+function escapeHtml(str) {
   if (HTML_ESCAPE_TEST_RE.test(str)) {
     return str.replace(HTML_ESCAPE_REPLACE_RE, replaceUnsafeChar)
   }
@@ -138,21 +123,16 @@ function escapeHtml (str) {
 
 const REGEXP_ESCAPE_RE = /[.?*+^$[\]\\(){}|-]/g
 
-function escapeRE (str) {
+function escapeRE(str) {
   return str.replace(REGEXP_ESCAPE_RE, '\\$&')
 }
 
-function isSpace (code) {
-  switch (code) {
-    case 0x09:
-    case 0x20:
-      return true
-  }
-  return false
+function isSpace(code) {
+  return code === 0x09 || code === 0x20
 }
 
 // Zs (unicode class) || [\t\f\v\r\n]
-function isWhiteSpace (code) {
+function isWhiteSpace(code) {
   if (code >= 0x2000 && code <= 0x200A) { return true }
   switch (code) {
     case 0x09: // \t
@@ -167,14 +147,15 @@ function isWhiteSpace (code) {
     case 0x205F:
     case 0x3000:
       return true
+    default:
+      return false
   }
-  return false
 }
 
 /* eslint-disable max-len */
 
 // Currently without astral characters support.
-function isPunctChar (ch) {
+function isPunctChar(ch) {
   return ucmicro.P.test(ch) || ucmicro.S.test(ch)
 }
 
@@ -185,7 +166,7 @@ function isPunctChar (ch) {
 //
 // Don't confuse with unicode punctuation !!! It lacks some chars in ascii range.
 //
-function isMdAsciiPunct (ch) {
+function isMdAsciiPunct(ch) {
   switch (ch) {
     case 0x21/* ! */:
     case 0x22/* " */:
@@ -226,10 +207,8 @@ function isMdAsciiPunct (ch) {
 }
 
 // Hepler to unify [reference labels].
-//
-function normalizeReference (str) {
+function normalizeReference(str) {
   // Trim and collapse whitespace
-  //
   str = str.trim().replace(/\s+/g, ' ')
 
   // In node v10 'ẞ'.toLowerCase() === 'Ṿ', which is presumed to be a bug
@@ -237,7 +216,6 @@ function normalizeReference (str) {
   //
   // So treat this one as a special case
   // (remove this when node v10 is no longer supported).
-  //
   if ('ẞ'.toLowerCase() === 'Ṿ') {
     str = str.replace(/ẞ/g, 'ß')
   }
@@ -273,14 +251,12 @@ function normalizeReference (str) {
   // Final result should be uppercased, because it's later stored in an object
   // (this avoid a conflict with Object.prototype members,
   // most notably, `__proto__`)
-  //
   return str.toLowerCase().toUpperCase()
 }
 
 // Re-export libraries commonly used in both markdown-it and its plugins,
 // so plugins won't have to depend on them explicitly, which reduces their
 // bundled size (e.g. a browser build).
-//
 const lib = { mdurl, ucmicro }
 
 export {

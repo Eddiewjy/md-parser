@@ -27,11 +27,7 @@ export default class Core {
   ruler: Ruler;
 
   constructor() {
-    /**
-     * Core#ruler -> Ruler
-     *
-     * [[Ruler]] 实例。保持核心规则的配置。
-     **/
+    // 创建规则管理器
     this.ruler = new Ruler()
 
     // 添加核心规则
@@ -40,11 +36,7 @@ export default class Core {
     }
   }
 
-  /**
-   * Core.process(state)
-   *
-   * 执行核心链规则。
-   **/
+  // 启用规则链
   process(state: StateCore): void {
     const rules = this.ruler.getRules('')
 
