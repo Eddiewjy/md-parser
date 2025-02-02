@@ -1,121 +1,143 @@
-
 // 用于解析内联元素（例如强调、链接、代码等）的状态机。
 
-import Token from '../token'
-import { isWhiteSpace, isPunctChar, isMdAsciiPunct } from '../common/utils'
+import Token from "../token";
+import { isWhiteSpace, isPunctChar, isMdAsciiPunct } from "../common/utils";
 
-export default function StateInline (src, md, env, outTokens) {
-  this.src = src
-  this.env = env
-  this.md = md
-  this.tokens = outTokens
-  this.tokens_meta = Array(outTokens.length)
+export default class StateInline {
+  src: string;
+  env: any;
+  md: any;
+  tokens: Token[];
+  tokens_meta: any[];
+  pos: number;
+  posMax: number;
+  level: number;
+  pending: string;
+  pendingLevel: number;
+  cache: Record<string, any>;
+  delimiters: any[];
+  _prev_delimiters: any[];
+  backticks: Record<string, number>;
+  backticksScanned: boolean;
+  linkLevel: number;
 
-  this.pos = 0
-  this.posMax = this.src.length
-  this.level = 0
-  this.pending = ''
-  this.pendingLevel = 0
+  constructor(src: string, md: any, env: any, outTokens: Token[]) {
+    this.src = src;
+    this.env = env;
+    this.md = md;
+    this.tokens = outTokens;
+    this.tokens_meta = Array(outTokens.length);
 
-  // 存储 { start: end } 对。用于回溯优化对解析（强调、删除线）。
-  this.cache = {}
+    this.pos = 0;
+    this.posMax = this.src.length;
+    this.level = 0;
+    this.pending = "";
+    this.pendingLevel = 0;
 
-  // 当前标签的强调类分隔符列表
-  this.delimiters = []
+    // 存储 { start: end } 对。用于回溯优化对解析（强调、删除线）。
+    this.cache = {};
 
-  // 上一级标签的分隔符列表堆栈
-  this._prev_delimiters = []
+    // 当前标签的强调类分隔符列表
+    this.delimiters = [];
 
-  // 反引号长度 => 最后看到的位置
-  this.backticks = {}
-  this.backticksScanned = false
+    // 上一级标签的分隔符列表堆栈
+    this._prev_delimiters = [];
 
-  // 用于禁用内联 linkify-it 执行的计数器
-  // 在 <a> 和 markdown 链接内
-  this.linkLevel = 0
-}
+    // 反引号长度 => 最后看到的位置
+    this.backticks = {};
+    this.backticksScanned = false;
 
-// 刷新待处理文本
-//
-StateInline.prototype.pushPending = function () {
-  const token = new Token('text', '', 0)
-  token.content = this.pending
-  token.level = this.pendingLevel
-  this.tokens.push(token)
-  this.pending = ''
-  return token
-}
-
-// 推送新标记到“流”中。
-// 如果存在待处理文本 - 将其作为文本标记刷新
-StateInline.prototype.push = function (type, tag, nesting) {
-  if (this.pending) {
-    this.pushPending()
+    // 用于禁用内联 linkify-it 执行的计数器
+    // 在 <a> 和 markdown 链接内
+    this.linkLevel = 0;
   }
 
-  const token = new Token(type, tag, nesting)
-  let token_meta = null
-
-  if (nesting < 0) {
-    // 关闭标签
-    this.level--
-    this.delimiters = this._prev_delimiters.pop()
+  // 刷新待处理文本
+  pushPending() {
+    const token = new Token("text", "", 0);
+    token.content = this.pending;
+    token.level = this.pendingLevel;
+    this.tokens.push(token);
+    this.pending = "";
+    return token;
   }
 
-  token.level = this.level
+  // 推送新标记到“流”中。
+  // 如果存在待处理文本 - 将其作为文本标记刷新
+  push(type: string, tag: string, nesting: number) {
+    if (this.pending) {
+      this.pushPending();
+    }
 
-  if (nesting > 0) {
-    // 打开标签
-    this.level++
-    this._prev_delimiters.push(this.delimiters)
-    this.delimiters = []
-    token_meta = { delimiters: this.delimiters }
+    const token = new Token(type, tag, nesting);
+    let token_meta = null;
+
+    if (nesting < 0) {
+      // 关闭标签
+      this.level--;
+      this.delimiters = this._prev_delimiters.pop() || [];
+    }
+
+    token.level = this.level;
+
+    if (nesting > 0) {
+      // 打开标签
+      this.level++;
+      this._prev_delimiters.push(this.delimiters);
+      this.delimiters = [];
+      token_meta = { delimiters: this.delimiters };
+    }
+
+    this.pendingLevel = this.level;
+    this.tokens.push(token);
+    this.tokens_meta.push(token_meta);
+    return token;
   }
 
-  this.pendingLevel = this.level
-  this.tokens.push(token)
-  this.tokens_meta.push(token_meta)
-  return token
+  // 扫描一系列类似强调的标记，并确定它是否可以开始或结束强调序列。
+  //
+  //  - start - 扫描的起始位置（应指向有效标记）；
+  //  - canSplitWord - 确定这些标记是否可以在单词中找到
+  scanDelims(start: number, canSplitWord: boolean) {
+    const max = this.posMax;
+    const marker = this.src.charCodeAt(start);
+
+    // 将行的开头视为空白
+    const lastChar = start > 0 ? this.src.charCodeAt(start - 1) : 0x20;
+
+    let pos = start;
+    while (pos < max && this.src.charCodeAt(pos) === marker) {
+      pos++;
+    }
+
+    const count = pos - start;
+
+    // 将行的结尾视为空白
+    const nextChar = pos < max ? this.src.charCodeAt(pos) : 0x20;
+
+    const isLastPunctChar =
+      isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar));
+    const isNextPunctChar =
+      isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar));
+
+    const isLastWhiteSpace = isWhiteSpace(lastChar);
+    const isNextWhiteSpace = isWhiteSpace(nextChar);
+
+    const left_flanking =
+      !isNextWhiteSpace &&
+      (!isNextPunctChar || isLastWhiteSpace || isLastPunctChar);
+    const right_flanking =
+      !isLastWhiteSpace &&
+      (!isLastPunctChar || isNextWhiteSpace || isNextPunctChar);
+
+    const can_open =
+      left_flanking && (canSplitWord || !right_flanking || isLastPunctChar);
+    const can_close =
+      right_flanking && (canSplitWord || !left_flanking || isNextPunctChar);
+
+    return { can_open, can_close, length: count };
+  }
+
+  // 重新导出 Token 类以在块规则中使用
+  Token = Token;
 }
-
-// 扫描一系列类似强调的标记，并确定它是否可以开始或结束强调序列。
-//
-//  - start - 扫描的起始位置（应指向有效标记）；
-//  - canSplitWord - 确定这些标记是否可以在单词中找到
-//
-StateInline.prototype.scanDelims = function (start, canSplitWord) {
-  const max = this.posMax
-  const marker = this.src.charCodeAt(start)
-
-  // 将行的开头视为空白
-  const lastChar = start > 0 ? this.src.charCodeAt(start - 1) : 0x20
-
-  let pos = start
-  while (pos < max && this.src.charCodeAt(pos) === marker) { pos++ }
-
-  const count = pos - start
-
-  // 将行的结尾视为空白
-  const nextChar = pos < max ? this.src.charCodeAt(pos) : 0x20
-
-  const isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar))
-  const isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar))
-
-  const isLastWhiteSpace = isWhiteSpace(lastChar)
-  const isNextWhiteSpace = isWhiteSpace(nextChar)
-
-  const left_flanking =
-    !isNextWhiteSpace && (!isNextPunctChar || isLastWhiteSpace || isLastPunctChar)
-  const right_flanking =
-    !isLastWhiteSpace && (!isLastPunctChar || isNextWhiteSpace || isNextPunctChar)
-
-  const can_open  = left_flanking  && (canSplitWord || !right_flanking || isLastPunctChar)
-  const can_close = right_flanking && (canSplitWord || !left_flanking  || isNextPunctChar)
-
-  return { can_open, can_close, length: count }
-}
-
-// 重新导出 Token 类以在块规则中使用
-StateInline.prototype.Token = Token
-
-

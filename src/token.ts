@@ -15,29 +15,33 @@ export default class Token {
   hidden: boolean;
 
   constructor(type: string, tag: string, nesting: number) {
-    this.type = type;      // 标记的类型，例如 "paragraph_open"
-    this.tag = tag;        // HTML 标签名，例如 "p"
-    this.attrs = null;     // HTML 属性，格式为 `[ [ name1, value1 ], [ name2, value2 ] ]`
-    this.map = null;       // 源映射信息，格式为 `[ line_begin, line_end ]`
+    this.type = type; // 标记的类型，例如 "paragraph_open"
+    this.tag = tag; // HTML 标签名，例如 "p"
+    this.attrs = null; // HTML 属性，格式为 `[ [ name1, value1 ], [ name2, value2 ] ]`
+    this.map = null; // 源映射信息，格式为 `[ line_begin, line_end ]`
     this.nesting = nesting; // 嵌套级别变化，-1 表示关闭标签，0 表示自闭合标签，1 表示打开标签
-    this.level = 0;        // 嵌套级别，与 `state.level` 相同
-    this.children = null;  // 子节点数组（内联和图片标记）
-    this.content = '';     // 自闭合标签的内容，例如代码、HTML、围栏等
-    this.markup = '';      // 标记符号，例如强调的 '*' 或 '_'
-    this.info = '';        // 附加信息，例如围栏标记的 info 字符串
-    this.meta = null;      // 插件存储任意数据的地方
-    this.block = false;    // 是否为块级标记，false 表示内联标记
-    this.hidden = false;   // 是否在渲染时忽略此元素，用于紧凑列表隐藏段落
+    this.level = 0; // 嵌套级别，与 `state.level` 相同
+    this.children = null; // 子节点数组（内联和图片标记）
+    this.content = ""; // 自闭合标签的内容，例如代码、HTML、围栏等
+    this.markup = ""; // 标记符号，例如强调的 '*' 或 '_'
+    this.info = ""; // 附加信息，例如围栏标记的 info 字符串
+    this.meta = null; // 插件存储任意数据的地方
+    this.block = false; // 是否为块级标记，false 表示内联标记
+    this.hidden = false; // 是否在渲染时忽略此元素，用于紧凑列表隐藏段落
   }
 
   attrIndex(name: string): number {
     // 搜索属性名的索引
-    if (!this.attrs) { return -1; }
+    if (!this.attrs) {
+      return -1;
+    }
 
     const attrs = this.attrs;
 
     for (let i = 0, len = attrs.length; i < len; i++) {
-      if (attrs[i][0] === name) { return i; }
+      if (attrs[i][0] === name) {
+        return i;
+      }
     }
     return -1;
   }
@@ -80,8 +84,7 @@ export default class Token {
     if (idx < 0) {
       this.attrPush([name, value]);
     } else {
-      this.attrs[idx][1] = this.attrs[idx][1] + ' ' + value;
+      this.attrs[idx][1] = this.attrs[idx][1] + " " + value;
     }
   }
 }
-

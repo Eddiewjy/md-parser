@@ -1,75 +1,124 @@
-// 主解析器类
+import IMarkdown from "./imd";
 
-import * as utils from './common/utils';
-import Renderer from './renderer';
-import ParserCore from './parser_core';
-import ParserBlock from './parser_block';
-import ParserInline from './parser_inline';
-import { ParserOptions } from './api';
-
-export default class IMarkdown {
-  inline: ParserInline;
-  block: ParserBlock;
-  core: ParserCore;
-  renderer: Renderer;
-  options: ParserOptions;
-
-  constructor(options?: ParserOptions) {
-    this.inline = new ParserInline();
-    this.block = new ParserBlock();
-    this.core = new ParserCore();
-    this.renderer = new Renderer();
-
-    this.options = {};
-    if (options) {
-      this.set(options);
-    }
-  }
-
-  parse(src: string, env: any): any[] {
-    if (typeof src !== 'string') {
-      throw new Error('Input data should be a String');
-    }
-
-    const state = new this.core.State(src, this, env);
-
-    this.core.process(state);
-
-    return state.tokens;
-  }
-
-  set(options: ParserOptions): this {
-    utils.assign(this.options, options);
-    return this;
-  }
-
-  enable(list: string[]): this {
-    // 启用规则
-    list.forEach(rule => {
-      this.core.ruler.enable(rule);
-    });
-    return this;
-  }
-
-  disable(list: string[]): this {
-    // 禁用规则
-    list.forEach(rule => {
-      this.core.ruler.disable(rule);
-    });
-    return this;
-  }
-
-  use(plugin: (instance: IMarkdown, params?: any) => void, params?: any): this {
-    plugin(this, params);
-    return this;
-  }
-
-  render(src: string, env?: any): string {
-    env = env || {};
-
-    return this.renderer.render(this.parse(src, env), this.options, env);
-  }
+// 解析器选项接口
+export interface ParserOptions {
+  features?: {
+    basic?: {
+      // 基础功能
+      headings?: boolean; //标题
+      textFormatting?: {
+        emphasis?: boolean; //加粗和斜体
+        strikethrough?: boolean; //删除线
+      };
+      lists?: boolean; //列表
+      media?: {
+        link?: boolean;
+        image?: boolean;
+      };
+      blockquotes?: boolean; //引用>
+      horizontalRule?: boolean; //水平线
+      tables?: boolean; //表格
+    };
+    extensions?: {
+      // 扩展功能
+      math?: boolean; //数学公式
+      mermaid?: boolean; //mermaid图表
+      footnotes?: boolean; //脚注
+      taskLists?: boolean; //任务列表
+    };
+  };
+  codeBlock?: {
+    //代码块
+    languages?: string[] | "all";
+    languageAliases?: Record<string, string>;
+  };
+  security?: {
+    //安全
+    allowHtml?: boolean;
+    sanitize?: boolean;
+  };
+  performance?: {
+    //性能优化
+    incrementalUpdates?: boolean;
+    lazyRendering?: boolean;
+  };
 }
 
+// getParserInstance 接口
+export default function getParserInstance(options: ParserOptions): IMarkdown {
+  const { features, codeBlock, security, performance } = options;
 
+  // 根据选项动态配置解析器的行为
+  const parserOptions: ParserOptions = {
+    features: features || {},
+    codeBlock: codeBlock || {},
+    security: security || {},
+    performance: performance || {},
+  };
+  const md = new IMarkdown();
+  // 启用基础功能
+  if (parserOptions.features.basic) {
+    const {
+      headings,
+      textFormatting,
+      lists,
+      media,
+      blockquotes,
+      horizontalRule,
+      tables,
+    } = parserOptions.features.basic;
+    if (headings) {
+      md.enable(["heading"]);
+    }
+    if (textFormatting) {
+      const { emphasis, strikethrough } = textFormatting;
+      if (emphasis) {
+        md.enable(["emphasis"]);
+      }
+      if (strikethrough) {
+        md.enable(["strikethrough"]);
+      }
+    }
+    if (lists) {
+      md.enable(["list"]);
+    }
+    if (media) {
+      const { link, image } = media;
+      if (link) {
+        md.enable(["link"]);
+      }
+      if (image) {
+        md.enable(["image"]);
+      }
+    }
+    if (blockquotes) {
+      md.enable(["blockquote"]);
+    }
+    if (horizontalRule) {
+      md.enable(["hr"]);
+    }
+    if (tables) {
+      md.enable(["table"]);
+    }
+  }
+  // 启用扩展功能
+  if (parserOptions.features.extensions) {
+    const { math, mermaid, footnotes, taskLists } =
+      parserOptions.features.extensions;
+    if (math) {
+      md.enable(["math"]);
+    }
+    if (mermaid) {
+      md.enable(["mermaid"]);
+    }
+    if (footnotes) {
+      md.enable(["footnote"]);
+    }
+    if (taskLists) {
+      md.enable(["taskList"]);
+    }
+  }
 
+  // 返回解析器实例
+  return md;
+}

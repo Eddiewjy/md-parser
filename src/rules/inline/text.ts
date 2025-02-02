@@ -8,79 +8,53 @@
 
 // !!!! Don't confuse with "Markdown ASCII Punctuation" chars
 // http://spec.commonmark.org/0.15/#ascii-punctuation-character
-function isTerminatorChar (ch) {
+function isTerminatorChar(ch) {
   switch (ch) {
-    case 0x0A/* \n */:
-    case 0x21/* ! */:
-    case 0x23/* # */:
-    case 0x24/* $ */:
-    case 0x25/* % */:
-    case 0x26/* & */:
-    case 0x2A/* * */:
-    case 0x2B/* + */:
-    case 0x2D/* - */:
-    case 0x3A/* : */:
-    case 0x3C/* < */:
-    case 0x3D/* = */:
-    case 0x3E/* > */:
-    case 0x40/* @ */:
-    case 0x5B/* [ */:
-    case 0x5C/* \ */:
-    case 0x5D/* ] */:
-    case 0x5E/* ^ */:
-    case 0x5F/* _ */:
-    case 0x60/* ` */:
-    case 0x7B/* { */:
-    case 0x7D/* } */:
-    case 0x7E/* ~ */:
-      return true
+    case 0x0a /* \n */:
+    case 0x21 /* ! */:
+    case 0x23 /* # */:
+    case 0x24 /* $ */:
+    case 0x25 /* % */:
+    case 0x26 /* & */:
+    case 0x2a /* * */:
+    case 0x2b /* + */:
+    case 0x2d /* - */:
+    case 0x3a /* : */:
+    case 0x3c /* < */:
+    case 0x3d /* = */:
+    case 0x3e /* > */:
+    case 0x40 /* @ */:
+    case 0x5b /* [ */:
+    case 0x5c /* \ */:
+    case 0x5d /* ] */:
+    case 0x5e /* ^ */:
+    case 0x5f /* _ */:
+    case 0x60 /* ` */:
+    case 0x7b /* { */:
+    case 0x7d /* } */:
+    case 0x7e /* ~ */:
+      return true;
     default:
-      return false
+      return false;
   }
 }
 
-export default function text (state, silent) {
-  let pos = state.pos
+export default function text(state, silent) {
+  let pos = state.pos;
 
   while (pos < state.posMax && !isTerminatorChar(state.src.charCodeAt(pos))) {
-    pos++
+    pos++;
   }
 
-  if (pos === state.pos) { return false }
-
-  if (!silent) { state.pending += state.src.slice(state.pos, pos) }
-
-  state.pos = pos
-
-  return true
-}
-
-// Alternative implementation, for memory.
-//
-// It costs 10% of performance, but allows extend terminators list, if place it
-// to `ParserInline` property. Probably, will switch to it sometime, such
-// flexibility required.
-
-/*
-var TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~]/;
-
-module.exports = function text(state, silent) {
-  var pos = state.pos,
-      idx = state.src.slice(pos).search(TERMINATOR_RE);
-
-  // first char is terminator -> empty text
-  if (idx === 0) { return false; }
-
-  // no terminator -> text till end of string
-  if (idx < 0) {
-    if (!silent) { state.pending += state.src.slice(pos); }
-    state.pos = state.src.length;
-    return true;
+  if (pos === state.pos) {
+    return false;
   }
 
-  if (!silent) { state.pending += state.src.slice(pos, pos + idx); }
+  if (!silent) {
+    state.pending += state.src.slice(state.pos, pos);
+  }
 
-  state.pos += idx;
+  state.pos = pos;
 
   return true;
-}; */
+}

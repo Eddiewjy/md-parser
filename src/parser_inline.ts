@@ -1,28 +1,28 @@
-import Ruler from './ruler';
-import StateInline from './fsm/state_inline';
+import Ruler from "./ruler";
+import StateInline from "./fsm/state_inline";
 
 // 基础语法规则
-import r_text from './rules/inline/text';
-import r_linkify from './rules/inline/linkify';
-import r_escape from './rules/inline/escape';
-import r_backticks from './rules/inline/backticks';
-import r_strikethrough from './rules/inline/strikethrough';
-import r_emphasis from './rules/inline/emphasis';
-import r_link from './rules/inline/link';
-import r_image from './rules/inline/image';
-import r_entity from './rules/inline/entity';
+import r_text from "./rules/inline/text";
+import r_linkify from "./rules/inline/linkify";
+import r_escape from "./rules/inline/escape";
+import r_backticks from "./rules/inline/backticks";
+import r_strikethrough from "./rules/inline/strikethrough";
+import r_emphasis from "./rules/inline/emphasis";
+import r_link from "./rules/inline/link";
+import r_image from "./rules/inline/image";
+import r_entity from "./rules/inline/entity";
 
 // 解析规则
 const _rules: [string, Function][] = [
-  ['text', r_text], // 普通文本
-  ['linkify', r_linkify], // 链接识别
-  ['escape', r_escape], // 转义字符
-  ['backticks', r_backticks], // 反引号
-  ['strikethrough', r_strikethrough.tokenize], // 删除线
-  ['emphasis', r_emphasis.tokenize], // 斜体
-  ['link', r_link], // 链接
-  ['image', r_image], // 图片
-  ['entity', r_entity] // HTML实体
+  ["text", r_text], // 普通文本
+  ["linkify", r_linkify], // 链接识别
+  ["escape", r_escape], // 转义字符
+  ["backticks", r_backticks], // 反引号
+  ["strikethrough", r_strikethrough.tokenize], // 删除线
+  ["emphasis", r_emphasis.tokenize], // 粗体
+  ["link", r_link], // 链接
+  ["image", r_image], // 图片
+  ["entity", r_entity], // HTML实体
 ];
 
 export default class ParserInline {
@@ -43,12 +43,12 @@ export default class ParserInline {
   // 如果任何规则成功，返回`true`
   skipToken(state: StateInline): void {
     const pos = state.pos;
-    const rules = this.ruler.getRules('');
+    const rules = this.ruler.getRules("");
     const len = rules.length;
     const maxNesting = state.md.options.maxNesting;
     const cache = state.cache;
 
-    if (typeof cache[pos] !== 'undefined') {
+    if (typeof cache[pos] !== "undefined") {
       state.pos = cache[pos];
       return;
     }
@@ -81,7 +81,7 @@ export default class ParserInline {
 
   // 生成指定范围内的tokens
   tokenize(state: StateInline): void {
-    const rules = this.ruler.getRules('');
+    const rules = this.ruler.getRules("");
     const len = rules.length;
     const end = state.posMax;
     const maxNesting = state.md.options.maxNesting;
@@ -128,5 +128,3 @@ export default class ParserInline {
     this.tokenize(state);
   }
 }
-
-
