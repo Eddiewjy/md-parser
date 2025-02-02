@@ -1,13 +1,13 @@
 // 该对象用于管理解析器的状态，以及解析器的输入和输出
 
-import Token from '../token';
-
+import Token from "../token";
+import IMarkdown from "../imd";
 export default class StateCore {
   src: string;
   env: any;
   tokens: Token[];
   inlineMode: boolean;
-  md: any;
+  md: IMarkdown;
 
   constructor(src: string, md: any, env: any) {
     this.src = src;
@@ -17,8 +17,6 @@ export default class StateCore {
     this.md = md; // 解析器实例的链接
   }
 
-  // 重新导出 Token 类以在核心规则中使用
+  // 将 Token 静态类型暴露出来
   static Token = Token;
 }
-
-

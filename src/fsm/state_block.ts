@@ -2,6 +2,7 @@
 
 import Token from "../token";
 import { isSpace } from "../common/utils";
+import IMarkdown from "../imd";
 
 export default class StateBlock {
   src: string;
@@ -22,7 +23,7 @@ export default class StateBlock {
   parentType: string;
   level: number;
 
-  constructor(src: string, md: any, env: any, tokens: Token[]) {
+  constructor(src: string, md: IMarkdown, env: any, tokens: Token[]) {
     this.src = src;
 
     // 解析器实例的链接
@@ -106,7 +107,7 @@ export default class StateBlock {
     this.lineMax = this.bMarks.length - 1; // 不计算最后一个假行
   }
 
-  // 推送新标记到“流”中。
+  // 推送新标记到“token流”中。
   push(type: string, tag: string, nesting: number) {
     const token = new Token(type, tag, nesting);
     token.block = true;
@@ -119,9 +120,9 @@ export default class StateBlock {
     return token;
   }
 
-  isEmpty(line: number): boolean {
-    return this.bMarks[line] + this.tShift[line] >= this.eMarks[line];
-  }
+  // isEmpty(line: number): boolean {
+  //   return this.bMarks[line] + this.tShift[line] >= this.eMarks[line];
+  // }
 
   skipEmptyLines(from: number): number {
     for (let max = this.lineMax; from < max; from++) {
@@ -132,114 +133,114 @@ export default class StateBlock {
     return from;
   }
 
-  // 从给定位置跳过空格。
-  skipSpaces(pos: number): number {
-    for (let max = this.src.length; pos < max; pos++) {
-      const ch = this.src.charCodeAt(pos);
-      if (!isSpace(ch)) {
-        break;
-      }
-    }
-    return pos;
-  }
+  // // 从给定位置跳过空格。
+  // skipSpaces(pos: number): number {
+  //   for (let max = this.src.length; pos < max; pos++) {
+  //     const ch = this.src.charCodeAt(pos);
+  //     if (!isSpace(ch)) {
+  //       break;
+  //     }
+  //   }
+  //   return pos;
+  // }
 
-  // 从给定位置反向跳过空格。
-  skipSpacesBack(pos: number, min: number): number {
-    if (pos <= min) {
-      return pos;
-    }
+  // // 从给定位置反向跳过空格。
+  // skipSpacesBack(pos: number, min: number): number {
+  //   if (pos <= min) {
+  //     return pos;
+  //   }
 
-    while (pos > min) {
-      if (!isSpace(this.src.charCodeAt(--pos))) {
-        return pos + 1;
-      }
-    }
-    return pos;
-  }
+  //   while (pos > min) {
+  //     if (!isSpace(this.src.charCodeAt(--pos))) {
+  //       return pos + 1;
+  //     }
+  //   }
+  //   return pos;
+  // }
 
-  // 从给定位置跳过字符代码
-  skipChars(pos: number, code: number): number {
-    for (let max = this.src.length; pos < max; pos++) {
-      if (this.src.charCodeAt(pos) !== code) {
-        break;
-      }
-    }
-    return pos;
-  }
+  // // 从给定位置跳过字符代码
+  // skipChars(pos: number, code: number): number {
+  //   for (let max = this.src.length; pos < max; pos++) {
+  //     if (this.src.charCodeAt(pos) !== code) {
+  //       break;
+  //     }
+  //   }
+  //   return pos;
+  // }
 
-  // 从给定位置 - 1 反向跳过字符代码
-  skipCharsBack(pos: number, code: number, min: number): number {
-    if (pos <= min) {
-      return pos;
-    }
+  // // 从给定位置 - 1 反向跳过字符代码
+  // skipCharsBack(pos: number, code: number, min: number): number {
+  //   if (pos <= min) {
+  //     return pos;
+  //   }
 
-    while (pos > min) {
-      if (code !== this.src.charCodeAt(--pos)) {
-        return pos + 1;
-      }
-    }
-    return pos;
-  }
+  //   while (pos > min) {
+  //     if (code !== this.src.charCodeAt(--pos)) {
+  //       return pos + 1;
+  //     }
+  //   }
+  //   return pos;
+  // }
 
-  // 从源代码中剪切行范围。
-  getLines(
-    begin: number,
-    end: number,
-    indent: number,
-    keepLastLF: boolean
-  ): string {
-    if (begin >= end) {
-      return "";
-    }
+  // // 从源代码中剪切行范围。
+  // getLines(
+  //   begin: number,
+  //   end: number,
+  //   indent: number,
+  //   keepLastLF: boolean
+  // ): string {
+  //   if (begin >= end) {
+  //     return "";
+  //   }
 
-    const queue = new Array(end - begin);
+  //   const queue = new Array(end - begin);
 
-    for (let i = 0, line = begin; line < end; line++, i++) {
-      let lineIndent = 0;
-      const lineStart = this.bMarks[line];
-      let first = lineStart;
-      let last;
+  //   for (let i = 0, line = begin; line < end; line++, i++) {
+  //     let lineIndent = 0;
+  //     const lineStart = this.bMarks[line];
+  //     let first = lineStart;
+  //     let last;
 
-      if (line + 1 < end || keepLastLF) {
-        // 不需要边界检查，因为我们在尾部有假条目。
-        last = this.eMarks[line] + 1;
-      } else {
-        last = this.eMarks[line];
-      }
+  //     if (line + 1 < end || keepLastLF) {
+  //       // 不需要边界检查，因为我们在尾部有假条目。
+  //       last = this.eMarks[line] + 1;
+  //     } else {
+  //       last = this.eMarks[line];
+  //     }
 
-      while (first < last && lineIndent < indent) {
-        const ch = this.src.charCodeAt(first);
+  //     while (first < last && lineIndent < indent) {
+  //       const ch = this.src.charCodeAt(first);
 
-        if (isSpace(ch)) {
-          if (ch === 0x09) {
-            lineIndent += 4 - ((lineIndent + this.bsCount[line]) % 4);
-          } else {
-            lineIndent++;
-          }
-        } else if (first - lineStart < this.tShift[line]) {
-          // 修补的 tShift 掩盖字符看起来像空格（引用块、列表标记）
-          lineIndent++;
-        } else {
-          break;
-        }
+  //       if (isSpace(ch)) {
+  //         if (ch === 0x09) {
+  //           lineIndent += 4 - ((lineIndent + this.bsCount[line]) % 4);
+  //         } else {
+  //           lineIndent++;
+  //         }
+  //       } else if (first - lineStart < this.tShift[line]) {
+  //         // 修补的 tShift 掩盖字符看起来像空格（引用块、列表标记）
+  //         lineIndent++;
+  //       } else {
+  //         break;
+  //       }
 
-        first++;
-      }
+  //       first++;
+  //     }
 
-      if (lineIndent > indent) {
-        // 部分展开代码块中的制表符，例如 '\t\tfoobar'
-        // 缩进=2 变成 '  \tfoobar'
-        queue[i] =
-          new Array(lineIndent - indent + 1).join(" ") +
-          this.src.slice(first, last);
-      } else {
-        queue[i] = this.src.slice(first, last);
-      }
-    }
+  //     if (lineIndent > indent) {
+  //       // 部分展开代码块中的制表符，例如 '\t\tfoobar'
+  //       // 缩进=2 变成 '  \tfoobar'
+  //       queue[i] =
+  //         new Array(lineIndent - indent + 1).join(" ") +
+  //         this.src.slice(first, last);
+  //     } else {
+  //       queue[i] = this.src.slice(first, last);
+  //     }
+  //   }
 
-    return queue.join("");
-  }
+  //   return queue.join("");
+  // }
 
   // 重新导出 Token 类以在块规则中使用
-  Token = Token;
+  static Token = Token;
 }

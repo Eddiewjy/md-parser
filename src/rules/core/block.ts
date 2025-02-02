@@ -1,11 +1,13 @@
-export default function block (state) {
-  let token;
+import StateCore from "../../fsm/state_core";
+import Token from "../../token";
+export default function block(state: StateCore): void {
+  let token: Token;
 
   if (state.inlineMode) {
     // 如果是内联模式，创建一个内联 token
-    token          = new state.Token('inline', '', 0);
-    token.content  = state.src;
-    token.map      = [0, 1];
+    token = new StateCore.Token("inline", "", 0);
+    token.content = state.src;
+    token.map = [0, 1];
     token.children = [];
     state.tokens.push(token);
   } else {

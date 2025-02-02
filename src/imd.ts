@@ -22,7 +22,7 @@ export default class IMarkdown {
 
   parse(src: string, env: any): any[] {
     if (typeof src !== "string") {
-      throw new Error("Input data should be a String");
+      throw new Error("Input source should be a string");
     }
 
     const state = new this.core.State(src, this, env);
@@ -34,22 +34,41 @@ export default class IMarkdown {
 
   enable(list: string[]): this {
     // 启用规则
-    list.forEach((rule) => {
-      this.core.ruler.enable(rule);
+    let result: string[] = [];
+    ["core", "block", "inline"].forEach((chain) => {
+      result = result.concat(this[chain].ruler.enable(list, true));
     });
+
+    result = result.concat(this.inline.ruler2.enable(list, true));
+
+    const missed = list.filter((name) => {
+      return result.indexOf(name) < 0;
+    });
+
+    if (missed.length) {
+      throw new Error("Failed to enable unknown rule(s): " + missed);
+    }
+
     return this;
   }
 
   disable(list: string[]): this {
     // 禁用规则
-    list.forEach((rule) => {
-      this.core.ruler.disable(rule);
+    let result: string[] = [];
+    ["core", "block", "inline"].forEach((chain) => {
+      result = result.concat(this[chain].ruler.disable(list, true));
     });
-    return this;
-  }
 
-  use(plugin: (instance: IMarkdown, params?: any) => void, params?: any): this {
-    plugin(this, params);
+    result = result.concat(this.inline.ruler2.disable(list, true));
+
+    const missed = list.filter((name) => {
+      return result.indexOf(name) < 0;
+    });
+
+    if (missed.length) {
+      throw new Error("Failed to disable unknown rule(s): " + missed);
+    }
+
     return this;
   }
 

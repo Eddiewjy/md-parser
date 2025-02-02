@@ -11,8 +11,10 @@ import r_emphasis from "./rules/inline/emphasis";
 import r_link from "./rules/inline/link";
 import r_image from "./rules/inline/image";
 import r_entity from "./rules/inline/entity";
+import r_balance_pairs from "./rules/inline/balance_pairs";
+import r_fragments_join from "./rules/inline/fragments_join";
 
-// 解析规则
+// 主解析规则
 const _rules: [string, Function][] = [
   ["text", r_text], // 普通文本
   ["linkify", r_linkify], // 链接识别
@@ -25,15 +27,29 @@ const _rules: [string, Function][] = [
   ["entity", r_entity], // HTML实体
 ];
 
+//解析成对标签,针对强调和删除线
+const _rules2: [string, Function, string[]?][] = [
+  ["balance_pairs", r_balance_pairs],
+  ["strikethrough", r_strikethrough.postProcess],
+  ["emphasis", r_emphasis.postProcess],
+  // rules for pairs separate '**' into its own text tokens, which may be left unused,
+  // rule below merges unused segments back with the rest of the text
+  ["fragments_join", r_fragments_join],
+];
+
 export default class ParserInline {
   ruler: Ruler;
+  ruler2: Ruler;
   State: typeof StateInline;
 
   constructor() {
     this.ruler = new Ruler();
-
+    this.ruler2 = new Ruler();
     for (const [name, rule] of _rules) {
       this.ruler.push(name, rule);
+    }
+    for (const [name, rule] of _rules2) {
+      this.ruler2.push(name, rule);
     }
 
     this.State = StateInline;
@@ -56,9 +72,9 @@ export default class ParserInline {
     let ok = false;
 
     if (state.level < maxNesting) {
-      for (let i = 0; i < len; i++) {
+      for (const rule of rules) {
         state.level++;
-        ok = rules[i](state, true);
+        ok = rule(state, true);
         state.level--;
 
         if (ok) {
@@ -82,7 +98,6 @@ export default class ParserInline {
   // 生成指定范围内的tokens
   tokenize(state: StateInline): void {
     const rules = this.ruler.getRules("");
-    const len = rules.length;
     const end = state.posMax;
     const maxNesting = state.md.options.maxNesting;
 
@@ -91,8 +106,8 @@ export default class ParserInline {
       let ok = false;
 
       if (state.level < maxNesting) {
-        for (let i = 0; i < len; i++) {
-          ok = rules[i](state, false);
+        for (const rule of rules) {
+          ok = rule(state, false);
           if (ok) {
             if (prevPos >= state.pos) {
               throw new Error("inline rule didn't increment state.pos");
@@ -122,9 +137,13 @@ export default class ParserInline {
    *
    * 处理输入字符串并将内联tokens推送到`outTokens`
    **/
-  parse(str: string, md: any, env: any, outTokens: any[]): void {
+  parse(str: string, md: any, env?: any, outTokens?: any[]): void {
     const state = new this.State(str, md, env, outTokens);
 
     this.tokenize(state);
+    const rules = this.ruler2.getRules("");
+    for (const rule of rules) {
+      rule(state);
+    }
   }
 }

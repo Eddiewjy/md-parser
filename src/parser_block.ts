@@ -3,30 +3,34 @@
  *
  * 块级解析器。
  **/
+//这里rule的参数要包括起始行和结束行，因为块级解析器是一块一块解析的
+import Ruler from "./ruler";
+import StateBlock from "./fsm/state_block";
+import IMarkdown from "./imd";
+import Token from "./token";
 
-import Ruler, { RulerType } from './ruler';
-import StateBlock from './fsm/state_block';
-
-import r_paragraph from './rules/block/paragraph';
-import r_heading from './rules/block/heading';
-import r_list from './rules/block/list';
-
-/**
- * 规则类型定义
- */
-type RuleFunction = (state: StateBlock, startLine: number, endLine: number, silent: boolean) => boolean;
-
-interface RuleConfig {
-  name: string;
-  rule: RuleFunction;
-  alt?: string[];
-}
+import r_paragraph from "./rules/block/paragraph";
+import r_heading from "./rules/block/heading";
+import r_list from "./rules/block/list";
+import r_table from "./rules/block/table";
+import r_blockquote from "./rules/block/blockquote";
+import r_hr from "./rules/block/hr";
 
 // 定义核心解析规则
-const _rules: RuleConfig[] = [
-  { name: 'paragraph', rule: r_paragraph },
-  { name: 'heading', rule: r_heading, alt: ['paragraph'] },
-  { name: 'list', rule: r_list, alt: ['paragraph', 'heading'] },
+const _rules: [string, Function, string[]?][] = [
+  ["table", r_table, ["paragraph", "reference"]],
+  //代码块功能，目前未导入
+  // ["code", r_code],
+  // ["fence", r_fence, ["paragraph", "reference", "blockquote", "list"]],
+  [
+    "blockquote",
+    r_blockquote,
+    ["paragraph", "reference", "blockquote", "list"],
+  ],
+  ["hr", r_hr, ["paragraph", "reference", "blockquote", "list"]],
+  ["list", r_list, ["paragraph", "reference", "blockquote"]],
+  ["heading", r_heading, ["paragraph", "reference", "blockquote"]],
+  ["paragraph", r_paragraph],
 ];
 
 /**
@@ -34,14 +38,16 @@ const _rules: RuleConfig[] = [
  */
 
 export default class ParserBlock {
-  ruler: RulerType;
+  ruler: Ruler;
   State: typeof StateBlock;
 
   constructor() {
     this.ruler = new Ruler();
 
-    for (const { name, rule, alt } of _rules) {
-      this.ruler.push(name, rule, { alt: alt?.slice() || [] });
+    for (const [name, rule, alt] of _rules) {
+      this.ruler.push(name, rule, {
+        alt: alt ? [...alt] : [],
+      });
     }
 
     this.State = StateBlock;
@@ -54,7 +60,7 @@ export default class ParserBlock {
    * @param endLine 结束行
    */
   tokenize(state: StateBlock, startLine: number, endLine: number): void {
-    const rules = this.ruler.getRules('');
+    const rules = this.ruler.getRules("");
     let line = startLine;
 
     while (line < endLine) {
@@ -74,7 +80,7 @@ export default class ParserBlock {
         }
       }
 
-      if (!matched) throw new Error('没有匹配的块规则');
+      if (!matched) throw new Error("没有匹配的块规则");
 
       line = state.line;
     }
@@ -85,13 +91,12 @@ export default class ParserBlock {
    * @param src 输入字符串
    * @param md Markdown 实例
    * @param env 环境变量
-   * @param outTokens 输出 Token 数组
+   * @param outTokens core 传入的token
    */
-  parse(src: string, md: any, env: any, outTokens: any[]): void {
+  parse(src: string, md: IMarkdown, env: any, outTokens: Token[]): void {
     if (!src) return;
 
     const state = new this.State(src, md, env, outTokens);
     this.tokenize(state, state.line, state.lineMax);
   }
 }
-

@@ -1,13 +1,12 @@
 /**
- * class Ruler
+ * class Ruler 规则管理器
  *
  * 帮助类，用于管理规则序列（函数）：
  *
  * - 保持规则的顺序
  * - 给每个规则分配名字
  * - 启用/禁用规则
- * - 添加/替换规则
- * - 缓存启用规则的列表
+ * - 缓存启用规则的列表，以便快速查找
  **/
 
 type Rule = {
@@ -28,18 +27,18 @@ export default class Ruler {
 
   // 查找规则的索引
   private __find__(name: string): number {
-    return this.__rules__.findIndex(rule => rule.name === name);
+    return this.__rules__.findIndex((rule) => rule.name === name);
   }
 
-  // 构建规则查找缓存
+  // 构建规则查找缓存，可以将时间复杂度从O(n^2)降低到O(n)
   private __compile__(): void {
-    const chains = [''];
+    const chains = [""];
 
     // 收集唯一的链名称
-    this.__rules__.forEach(rule => {
+    this.__rules__.forEach((rule) => {
       if (!rule.enabled) return;
 
-      rule.alt.forEach(altName => {
+      rule.alt.forEach((altName) => {
         if (!chains.includes(altName)) {
           chains.push(altName);
         }
@@ -48,9 +47,9 @@ export default class Ruler {
 
     this.__cache__ = {};
 
-    chains.forEach(chain => {
+    chains.forEach((chain) => {
       this.__cache__![chain] = [];
-      this.__rules__.forEach(rule => {
+      this.__rules__.forEach((rule) => {
         if (!rule.enabled) return;
 
         if (chain && !rule.alt.includes(chain)) return;
@@ -60,35 +59,7 @@ export default class Ruler {
     });
   }
 
-  /**
-   * Ruler.at(name, fn [, options])
-   * - name (String): 规则名称，用来替换现有规则
-   * - fn (Function): 新的规则函数
-   * - options (Object): 新规则的选项（可选）
-   *
-   * 通过名称替换规则。如果未找到名称，会抛出错误。
-   */
-  at(name: string, fn: Function, options?: { alt?: string[] }): void {
-    const index = this.__find__(name);
-    const opt = options || {};
-
-    if (index === -1) {
-      throw new Error('规则未找到: ' + name);
-    }
-
-    this.__rules__[index].fn = fn;
-    this.__rules__[index].alt = opt.alt || [];
-    this.__cache__ = null;
-  }
-
-  /**
-   * Ruler.push(ruleName, fn [, options])
-   * - ruleName (String): 规则名称
-   * - fn (Function): 规则函数
-   * - options (Object): 规则选项（可选）
-   *
-   * 将新规则添加到链的末尾
-   */
+  // 添加规则到链尾
   push(ruleName: string, fn: Function, options?: { alt?: string[] }): void {
     const opt = options || {};
 
@@ -96,19 +67,13 @@ export default class Ruler {
       name: ruleName,
       enabled: true,
       fn,
-      alt: opt.alt || []
+      alt: opt.alt || [],
     });
 
     this.__cache__ = null;
   }
 
-  /**
-   * Ruler.enable(list [, ignoreInvalid]) -> Array
-   * - list (String|Array): 需要启用的规则名称列表
-   * - ignoreInvalid (Boolean): 是否忽略未找到规则的错误
-   *
-   * 启用给定名称的规则，如果未找到规则，抛出错误
-   */
+  //启用给定名称的规则，如果未找到规则，抛出错误
   enable(list: string | string[], ignoreInvalid?: boolean): string[] {
     if (!Array.isArray(list)) {
       list = [list];
@@ -117,12 +82,12 @@ export default class Ruler {
     const result: string[] = [];
 
     // 查找并启用规则
-    list.forEach(name => {
+    list.forEach((name) => {
       const idx = this.__find__(name);
 
       if (idx < 0) {
         if (ignoreInvalid) return;
-        throw new Error('规则管理: 无效的规则名称 ' + name);
+        throw new Error("规则管理: 无效的规则名称 " + name);
       }
       this.__rules__[idx].enabled = true;
       result.push(name);
@@ -132,13 +97,7 @@ export default class Ruler {
     return result;
   }
 
-  /**
-   * Ruler.disable(list [, ignoreInvalid]) -> Array
-   * - list (String|Array): 需要禁用的规则名称列表
-   * - ignoreInvalid (Boolean): 是否忽略未找到规则的错误
-   *
-   * 禁用给定名称的规则，如果未找到规则，抛出错误
-   */
+  //禁用给定名称的规则，如果未找到规则，抛出错误
   disable(list: string | string[], ignoreInvalid?: boolean): string[] {
     if (!Array.isArray(list)) {
       list = [list];
@@ -147,12 +106,12 @@ export default class Ruler {
     const result: string[] = [];
 
     // 查找并禁用规则
-    list.forEach(name => {
+    list.forEach((name) => {
       const idx = this.__find__(name);
 
       if (idx < 0) {
         if (ignoreInvalid) return;
-        throw new Error('规则管理: 无效的规则名称 ' + name);
+        throw new Error("规则管理: 无效的规则名称 " + name);
       }
       this.__rules__[idx].enabled = false;
       result.push(name);
@@ -162,11 +121,7 @@ export default class Ruler {
     return result;
   }
 
-  /**
-   * Ruler.getRules(chainName) -> Array
-   *
-   * 返回给定链名称的启用规则函数列表
-   */
+  //获取给定链名称的规则列表
   getRules(chainName: string): Function[] {
     if (this.__cache__ === null) {
       this.__compile__();
@@ -176,5 +131,3 @@ export default class Ruler {
     return this.__cache__[chainName] || [];
   }
 }
-
-export type RulerType = Ruler;
