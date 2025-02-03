@@ -1,4 +1,4 @@
-// Block quotes
+// 块引用 > blockquote
 
 import { isSpace } from "../../common/utils";
 

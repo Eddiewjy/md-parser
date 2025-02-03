@@ -11,11 +11,8 @@ import r_normalize from "./rules/core/normalize";
 import r_block from "./rules/core/block";
 import r_inline from "./rules/core/inline";
 
-// 定义规则类型
-type Rule = [string, (state: StateCore) => void];
-
 //先将字符串正规化，然后解析块级元素，最后解析内联元素
-const _rules: Rule[] = [
+const _rules: [string, Function][] = [
   ["normalize", r_normalize],
   ["block", r_block],
   ["inline", r_inline],

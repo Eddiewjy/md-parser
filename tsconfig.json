@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020", // 将 TypeScript 编译成 ES2020 版本的 JavaScript
     "module": "ESNext", // 使用 ESNext 模块系统
-    "moduleResolution": "Node", // 使用 Node.js 模块解析策略
+    "moduleResolution": "node", // 使用 Node.js 模块解析策略
     "outDir": "./dist", // 指定编译输出目录为 ./dist
     "esModuleInterop": true, // 启用对 ES 模块的互操作性，允许默认导入
     "declaration": true, // 生成 .d.ts 声明文件
@@ -10,5 +10,5 @@
     "resolveJsonModule": true, // 允许导入 JSON 文件
     "allowSyntheticDefaultImports": true // 允许从没有默认导出的模块中默认导入
   },
-  "include": ["src/**/*.ts"] // 指定包含的文件，编译 src 目录下的所有 .ts 文件
+  "include": ["src/**/*","package.json"] // 指定包含的文件，编译 src 目录下的所有文件
 }

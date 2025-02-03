@@ -1,10 +1,10 @@
-// Horizontal rule 水平线
+// 水平线 ---, ***, ___
 
 import { isSpace } from "../../common/utils";
 
 export default function hr(state, startLine, endLine, silent) {
   const max = state.eMarks[startLine];
-  // if it's indented more than 3 spaces, it should be a code block
+  // 如果缩进超过3个空格，则应为代码块
   if (state.sCount[startLine] - state.blkIndent >= 4) {
     return false;
   }
@@ -12,7 +12,7 @@ export default function hr(state, startLine, endLine, silent) {
   let pos = state.bMarks[startLine] + state.tShift[startLine];
   const marker = state.src.charCodeAt(pos++);
 
-  // Check hr marker
+  // 检查水平线标记
   if (
     marker !== 0x2a /* * */ &&
     marker !== 0x2d /* - */ &&
@@ -21,7 +21,7 @@ export default function hr(state, startLine, endLine, silent) {
     return false;
   }
 
-  // markers can be mixed with spaces, but there should be at least 3 of them
+  // 标记可以与空格混合，但至少应有3个标记
 
   let cnt = 1;
   while (pos < max) {

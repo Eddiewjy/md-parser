@@ -1,18 +1,18 @@
 // Token 类表示词法分析中的一个标记
 export default class Token {
-  type: string;
-  tag: string;
-  attrs: [string, string][] | null;
-  map: [number, number] | null;
-  nesting: number;
-  level: number;
-  children: Token[] | null;
-  content: string;
-  markup: string;
-  info: string;
-  meta: any;
-  block: boolean;
-  hidden: boolean;
+  type?: string;
+  tag?: string;
+  attrs?: [string, string][] | null;
+  map?: [number, number] | null;
+  nesting?: number;
+  level?: number;
+  children?: Token[] | null;
+  content?: string;
+  markup?: string;
+  info?: string;
+  meta?: any;
+  block?: boolean;
+  hidden?: boolean;
 
   constructor(type: string, tag: string, nesting: number) {
     this.type = type; // 标记的类型，例如 "paragraph_open"
