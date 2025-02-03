@@ -2,7 +2,7 @@
 export default class Token {
   type?: string;
   tag?: string;
-  attrs?: [string, string][] | null;
+  attrs?: string[][] | null;
   map?: [number, number] | null;
   nesting?: number;
   level?: number;

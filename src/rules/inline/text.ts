@@ -1,12 +1,12 @@
 // Skip text characters for text token, place those to pending buffer
 // and increment current pos
 
-// Rule to skip pure text
-// '{}$%@~+=:' reserved for extentions
+// 跳过纯文本的规则
+// '{}$%@~+=:' 保留用于扩展
 
-// !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, :, ;, <, =, >, ?, @, [, \, ], ^, _, `, {, |, }, or ~
+// !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, :, ;, <, =, >, ?, @, [, \, ], ^, _, `, {, |, }, 或 ~
 
-// !!!! Don't confuse with "Markdown ASCII Punctuation" chars
+// !!!! 不要与“Markdown ASCII 标点”字符混淆
 // http://spec.commonmark.org/0.15/#ascii-punctuation-character
 function isTerminatorChar(ch) {
   switch (ch) {

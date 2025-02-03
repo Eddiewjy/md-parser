@@ -7,19 +7,19 @@ export default class StateInline {
   src: string;
   env: any;
   md: any;
-  tokens: Token[];
-  tokens_meta: any[];
-  pos: number;
-  posMax: number;
-  level: number;
-  pending: string;
-  pendingLevel: number;
-  cache: Record<string, any>;
-  delimiters: any[];
-  _prev_delimiters: any[];
-  backticks: Record<string, number>;
-  backticksScanned: boolean;
-  linkLevel: number;
+  tokens: Token[]; //输出的标记
+  tokens_meta: any[]; //元数据
+  pos: number; //当前位置
+  posMax: number; //输入字符串的长度
+  level: number; //当前标签的级别
+  pending: string; //待处理文本
+  pendingLevel: number; //待处理文本的级别
+  cache: Record<string, any>; //缓存
+  delimiters: any[]; //当前标签的强调类分隔符列表
+  _prev_delimiters: any[]; //上一级标签的分隔符列表堆栈
+  backticks: Record<string, number>; //反引号长度 => 最后看到的位置
+  backticksScanned: boolean; //是否已扫描反引号
+  linkLevel: number; //用于禁用内联 linkify-it 执行的计数器
 
   constructor(src: string, md: any, env: any, outTokens: Token[]) {
     this.src = src;

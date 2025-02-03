@@ -1,25 +1,12 @@
-// 处理 HTML 实体 - &#123;, &#xAF;, &quot;, ...
-
+// Process html entity - &#123;, &#xAF;, &quot;, ...
+import StateInline from "../../fsm/state_inline";
 import { decodeHTML } from "entities";
 import { isValidEntityCode, fromCodePoint } from "../../common/utils";
 
 const DIGITAL_RE = /^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i;
 const NAMED_RE = /^&([a-z][a-z0-9]{1,31});/i;
 
-interface State {
-  pos: number;
-  posMax: number;
-  src: string;
-  push: (type: string, tag: string, nesting: number) => Token;
-}
-
-interface Token {
-  content: string;
-  markup: string;
-  info: string;
-}
-
-export default function entity(state: State, silent: boolean): boolean {
+export default function entity(state: StateInline, silent) {
   const pos = state.pos;
   const max = state.posMax;
 
