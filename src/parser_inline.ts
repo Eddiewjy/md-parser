@@ -1,18 +1,18 @@
-import Ruler from "./ruler";
-import StateInline from "./fsm/state_inline";
+import Ruler from "./ruler.js";
+import StateInline from "./fsm/state_inline.js";
 
 // 基础语法规则
-import r_text from "./rules/inline/text";
-import r_linkify from "./rules/inline/linkify";
-import r_escape from "./rules/inline/escape";
-import r_backticks from "./rules/inline/backticks";
-import r_strikethrough from "./rules/inline/strikethrough";
-import r_emphasis from "./rules/inline/emphasis";
-import r_link from "./rules/inline/link";
-import r_image from "./rules/inline/image";
-import r_entity from "./rules/inline/entity";
-import r_balance_pairs from "./rules/inline/balance_pairs";
-import r_fragments_join from "./rules/inline/fragments_join";
+import r_text from "./rules/inline/text.js";
+import r_linkify from "./rules/inline/linkify.js";
+import r_escape from "./rules/inline/escape.js";
+import r_backticks from "./rules/inline/backticks.js";
+import r_strikethrough from "./rules/inline/strikethrough.js";
+import r_emphasis from "./rules/inline/emphasis.js";
+import r_link from "./rules/inline/link.js";
+import r_image from "./rules/inline/image.js";
+import r_entity from "./rules/inline/entity.js";
+import r_balance_pairs from "./rules/inline/balance_pairs.js";
+import r_fragments_join from "./rules/inline/fragments_join.js";
 
 // 主解析规则
 const _rules: [string, Function][] = [

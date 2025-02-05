@@ -1,8 +1,8 @@
 // Process [link](<to> "stuff")
 //处理链接 [link](<to> "stuff")
-import StateInline from "../../fsm/state_inline";
+import StateInline from "../../fsm/state_inline.js";
 
-import { normalizeReference, isSpace } from "../../common/utils";
+import { normalizeReference, isSpace } from "../../common/utils.js";
 
 export default function link(state: StateInline, silent) {
   let code: number,

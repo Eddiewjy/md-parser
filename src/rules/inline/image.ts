@@ -1,8 +1,8 @@
 // Process ![image](<src> "title")
 //处理图片链接
-import StateInline from "../../fsm/state_inline";
+import StateInline from "../../fsm/state_inline.js";
 
-import { normalizeReference, isSpace } from "../../common/utils";
+import { normalizeReference, isSpace } from "../../common/utils.js";
 
 export default function image(state: StateInline, silent) {
   let code, content, label, pos, ref, res, title, start;

@@ -1,11 +1,11 @@
 // 主解析器类
 
-import Renderer from "./renderer";
-import ParserCore from "./parser_core";
-import ParserBlock from "./parser_block";
-import ParserInline from "./parser_inline";
+import Renderer from "./renderer.js";
+import ParserCore from "./parser_core.js";
+import ParserBlock from "./parser_block.js";
+import ParserInline from "./parser_inline.js";
 
-export default class IMarkdown {
+export class IMarkdown {
   inline: ParserInline;
   block: ParserBlock;
   core: ParserCore;

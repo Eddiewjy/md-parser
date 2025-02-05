@@ -1,10 +1,11 @@
 {
   "name": "md-parser",
   "version": "1.0.0",
-  "main": "./dist/index.cjs.js",
+  "main": "./dist/index.cjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "test": "jest",
+    "build": "tsc --project tsconfig.json",
+    "start": "node dist/useParser.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
@@ -23,7 +24,7 @@
   "ts-node": {
     "files": true
   },
-  "module": "dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": {
     "import": "./dist/index.mjs",
     "require": "./dist/index.cjs"

@@ -4,24 +4,24 @@
  * 块级解析器。
  **/
 //这里rule的参数要包括起始行和结束行，因为块级解析器是一块一块解析的
-import Ruler from "./ruler";
-import StateBlock from "./fsm/state_block";
-import IMarkdown from "./imd";
-import Token from "./token";
+import Ruler from "./ruler.js";
+import StateBlock from "./fsm/state_block.js";
+import { IMarkdown } from "./imd.js";
+import Token from "./token.js";
 
-import r_paragraph from "./rules/block/paragraph";
-import r_heading from "./rules/block/heading";
-import r_list from "./rules/block/list";
-import r_table from "./rules/block/table";
-import r_blockquote from "./rules/block/blockquote";
-import r_hr from "./rules/block/hr";
-
+import r_paragraph from "./rules/block/paragraph.js";
+import r_heading from "./rules/block/heading.js";
+import r_list from "./rules/block/list.js";
+import r_table from "./rules/block/table.js";
+import r_blockquote from "./rules/block/blockquote.js";
+import r_hr from "./rules/block/hr.js";
+import r_code from "./rules/block/code.js";
+import r_fence from "./rules/block/fence.js";
 // 定义核心解析规则
 const _rules: [string, Function, string[]?][] = [
   ["table", r_table, ["paragraph", "reference"]],
-  //代码块功能，目前未导入
-  // ["code", r_code],
-  // ["fence", r_fence, ["paragraph", "reference", "blockquote", "list"]],
+  ["code", r_code],
+  ["fence", r_fence, ["paragraph", "reference", "blockquote", "list"]],
   [
     "blockquote",
     r_blockquote,
@@ -29,7 +29,10 @@ const _rules: [string, Function, string[]?][] = [
   ],
   ["hr", r_hr, ["paragraph", "reference", "blockquote", "list"]],
   ["list", r_list, ["paragraph", "reference", "blockquote"]],
+  // ["reference", r_reference],
+  // ["html_block", r_html_block, ["paragraph", "reference", "blockquote"]],
   ["heading", r_heading, ["paragraph", "reference", "blockquote"]],
+  // ["lheading", r_lheading],
   ["paragraph", r_paragraph],
 ];
 
@@ -74,7 +77,7 @@ export default class ParserBlock {
         matched = rule(state, line, endLine, false);
         if (matched) {
           if (prevLine >= state.line) {
-            throw new Error("块规则未正确递增 state.line");
+            throw new Error("块规则未正确递增state.line");
           }
           break;
         }

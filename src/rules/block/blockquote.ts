@@ -1,6 +1,6 @@
 // 块引用 > blockquote
 
-import { isSpace } from "../../common/utils";
+import { isSpace } from "../../common/utils.js";
 
 export default function blockquote(state, startLine, endLine, silent) {
   let pos = state.bMarks[startLine] + state.tShift[startLine];

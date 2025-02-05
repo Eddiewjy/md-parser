@@ -1,7 +1,7 @@
 // Process html entity - &#123;, &#xAF;, &quot;, ...
-import StateInline from "../../fsm/state_inline";
+import StateInline from "../../fsm/state_inline.js";
 import { decodeHTML } from "entities";
-import { isValidEntityCode, fromCodePoint } from "../../common/utils";
+import { isValidEntityCode, fromCodePoint } from "../../common/utils.js";
 
 const DIGITAL_RE = /^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i;
 const NAMED_RE = /^&([a-z][a-z0-9]{1,31});/i;

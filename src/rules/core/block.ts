@@ -1,5 +1,5 @@
-import StateCore from "../../fsm/state_core";
-import Token from "../../token";
+import StateCore from "../../fsm/state_core.js";
+import Token from "../../token.js";
 export default function block(state: StateCore): void {
   let token: Token;
 

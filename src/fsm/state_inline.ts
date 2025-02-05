@@ -1,7 +1,7 @@
 // 用于解析内联元素（例如强调、链接、代码等）的状态机。
 
-import Token from "../token";
-import { isWhiteSpace, isPunctChar, isMdAsciiPunct } from "../common/utils";
+import Token from "../token.js";
+import { isWhiteSpace, isPunctChar, isMdAsciiPunct } from "../common/utils.js";
 
 export default class StateInline {
   src: string;

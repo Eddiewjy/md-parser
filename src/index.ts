@@ -1,4 +1,4 @@
-import IMarkdown from "./imd";
+import { IMarkdown } from "./imd.js";
 
 // 解析器选项接口
 export interface ParserOptions {
@@ -57,7 +57,7 @@ const ruleMap: { [key: string]: string[] } = {
 };
 
 // getParserInstance 接口
-export default function getParserInstance(options: ParserOptions): IMarkdown {
+export function getParserInstance(options: ParserOptions): IMarkdown {
   const { features, codeBlock, security, performance } = options;
 
   // 根据选项动态配置解析器的行为

@@ -1,6 +1,6 @@
 // Process escaped chars and hardbreaks
 //转义字符和硬换行符（\\ 转义符和换行符）
-import { isSpace } from "../../common/utils";
+import { isSpace } from "../../common/utils.js";
 
 const ESCAPED = [];
 

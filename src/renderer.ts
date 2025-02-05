@@ -1,5 +1,5 @@
-import { assign, unescapeAll, escapeHtml } from "./common/utils";
-import Token from "./token";
+import { assign, unescapeAll, escapeHtml } from "./common/utils.js";
+import Token from "./token.js";
 
 const default_rules: { [key: string]: Function } = {};
 

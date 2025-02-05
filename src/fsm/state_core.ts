@@ -1,7 +1,7 @@
 // 该对象用于管理解析器的状态，以及解析器的输入和输出
 
-import Token from "../token";
-import IMarkdown from "../imd";
+import Token from "../token.js";
+import { IMarkdown } from "../imd.js";
 export default class StateCore {
   src: string;
   env: any;

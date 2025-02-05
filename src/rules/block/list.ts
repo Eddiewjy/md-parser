@@ -1,6 +1,6 @@
 // 有序列表和无序列表
 
-import { isSpace } from "../../common/utils";
+import { isSpace } from "../../common/utils.js";
 
 // 搜索 `[-+*][\n ]`，成功时返回标记后的下一个位置，否则返回 -1。
 function skipBulletListMarker(state, startLine) {

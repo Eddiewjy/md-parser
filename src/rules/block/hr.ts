@@ -1,6 +1,6 @@
 // 水平线 ---, ***, ___
 
-import { isSpace } from "../../common/utils";
+import { isSpace } from "../../common/utils.js";
 
 export default function hr(state, startLine, endLine, silent) {
   const max = state.eMarks[startLine];

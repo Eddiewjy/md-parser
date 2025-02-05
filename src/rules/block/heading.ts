@@ -1,6 +1,6 @@
 // 标题 (#, ##, ...)
 
-import { isSpace } from "../../common/utils";
+import { isSpace } from "../../common/utils.js";
 
 export default function heading(state, startLine, endLine, silent) {
   let pos = state.bMarks[startLine] + state.tShift[startLine]; // 当前行的开始位置

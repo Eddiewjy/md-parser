@@ -1,6 +1,6 @@
 // 解析 *this* 和 **this** 的强调标记，也支持 _this_ 和 __this__
 
-import StateInline from "../../fsm/state_inline";
+import StateInline from "../../fsm/state_inline.js";
 
 // 插入每个标记作为单独的文本标记，并将其添加到分隔符列表中
 //
