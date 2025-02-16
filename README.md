@@ -30,6 +30,10 @@
 
 ## 使用方式
 
+`npm i`
+
+`npm run build`
+
 `npm start`
 
 编辑器接口处可看 useParser，对接口进行了一定程度的修改（目前集中在 feature）。
