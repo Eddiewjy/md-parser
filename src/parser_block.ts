@@ -17,6 +17,7 @@ import r_blockquote from "./rules/block/blockquote.js";
 import r_hr from "./rules/block/hr.js";
 import r_code from "./rules/block/code.js";
 import r_fence from "./rules/block/fence.js";
+import r_reference from "./rules/block/reference.js";
 // 定义核心解析规则
 const _rules: [string, Function, string[]?][] = [
   ["table", r_table, ["paragraph", "reference"]],
@@ -29,7 +30,7 @@ const _rules: [string, Function, string[]?][] = [
   ],
   ["hr", r_hr, ["paragraph", "reference", "blockquote", "list"]],
   ["list", r_list, ["paragraph", "reference", "blockquote"]],
-  // ["reference", r_reference],
+  ["reference", r_reference],
   // ["html_block", r_html_block, ["paragraph", "reference", "blockquote"]],
   ["heading", r_heading, ["paragraph", "reference", "blockquote"]],
   // ["lheading", r_lheading],

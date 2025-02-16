@@ -1,10 +1,4 @@
-// Join raw text tokens with the rest of the text
-//
-// This is set as a separate rule to provide an opportunity for plugins
-// to run text replacements after text join, but before escape join.
-//
-// For example, `\:)` shouldn't be replaced with an emoji.
-//
+//拼接相邻的文本节点
 
 export default function text_join(state) {
   let curr, last;
@@ -13,16 +7,13 @@ export default function text_join(state) {
 
   for (let j = 0; j < l; j++) {
     if (blockTokens[j].type !== "inline") continue;
-
     const tokens = blockTokens[j].children;
     const max = tokens.length;
-
     for (curr = 0; curr < max; curr++) {
       if (tokens[curr].type === "text_special") {
         tokens[curr].type = "text";
       }
     }
-
     for (curr = last = 0; curr < max; curr++) {
       if (
         tokens[curr].type === "text" &&
@@ -36,7 +27,6 @@ export default function text_join(state) {
         if (curr !== last) {
           tokens[last] = tokens[curr];
         }
-
         last++;
       }
     }

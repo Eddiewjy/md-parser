@@ -1,4 +1,4 @@
-// fences (``` lang, ~~~ lang)
+// fences (``` lang, ~~~ lang) 代码块
 
 export default function fence (state, startLine, endLine, silent) {
   let pos = state.bMarks[startLine] + state.tShift[startLine]

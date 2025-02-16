@@ -55,45 +55,45 @@ export default class ParserInline {
     this.State = StateInline;
   }
 
-  // // 跳过单个token，通过验证模式运行所有规则；
-  // // 如果任何规则成功，返回`true`
-  // skipToken(state: StateInline): void {
-  //   const pos = state.pos;
-  //   const rules = this.ruler.getRules("");
-  //   const len = rules.length;
-  //   const maxNesting = state.md.options.maxNesting;
-  //   const cache = state.cache;
+  // 跳过单个token，通过验证模式运行所有规则；
+  // 如果任何规则成功，返回`true`
+  skipToken(state: StateInline): void {
+    const pos = state.pos;
+    const rules = this.ruler.getRules("");
+    const len = rules.length;
+    const maxNesting = state.md.options.maxNesting;
+    const cache = state.cache;
 
-  //   if (typeof cache[pos] !== "undefined") {
-  //     state.pos = cache[pos];
-  //     return;
-  //   }
+    if (typeof cache[pos] !== "undefined") {
+      state.pos = cache[pos];
+      return;
+    }
 
-  //   let ok = false;
+    let ok = false;
 
-  //   if (state.level < maxNesting) {
-  //     for (const rule of rules) {
-  //       state.level++;
-  //       ok = rule(state, true);
-  //       state.level--;
+    if (state.level < maxNesting) {
+      for (const rule of rules) {
+        state.level++;
+        ok = rule(state, true);
+        state.level--;
 
-  //       if (ok) {
-  //         if (pos >= state.pos) {
-  //           throw new Error("inline rule didn't increment state.pos");
-  //         }
-  //         break;
-  //       }
-  //     }
-  //   } else {
-  //     // 嵌套过多，直接跳到段落结束
-  //     state.pos = state.posMax;
-  //   }
+        if (ok) {
+          if (pos >= state.pos) {
+            throw new Error("inline rule didn't increment state.pos");
+          }
+          break;
+        }
+      }
+    } else {
+      // 嵌套过多，直接跳到段落结束
+      state.pos = state.posMax;
+    }
 
-  //   if (!ok) {
-  //     state.pos++;
-  //   }
-  //   cache[pos] = state.pos;
-  // }
+    if (!ok) {
+      state.pos++;
+    }
+    cache[pos] = state.pos;
+  }
 
   // 生成指定范围内的tokens
   tokenize(state: StateInline): void {

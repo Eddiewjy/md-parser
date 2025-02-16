@@ -1,4 +1,5 @@
 import StateCore from "../../fsm/state_core.js";
+
 export default function inline(state: StateCore): void {
   const tokens = state.tokens;
   // 解析内联元素
