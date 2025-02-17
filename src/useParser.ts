@@ -35,8 +35,6 @@ const result = md.render(`
 
 ---
 
-
-
 > 这是一个引用
 
 | 表头1 | 表头2 |

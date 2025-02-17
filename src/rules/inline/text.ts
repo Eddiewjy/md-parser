@@ -40,6 +40,7 @@ function isTerminatorChar(ch) {
 }
 
 export default function text(state, silent) {
+  // console.log("lll");
   let pos = state.pos;
 
   while (pos < state.posMax && !isTerminatorChar(state.src.charCodeAt(pos))) {

@@ -55,12 +55,8 @@ export default function link(state: StateInline, silent) {
     start = pos;
     res = state.md.helpers.parseLinkDestination(state.src, pos, state.posMax);
     if (res.ok) {
-      href = state.md.normalizeLink(res.str);
-      if (state.md.validateLink(href)) {
-        pos = res.pos;
-      } else {
-        href = "";
-      }
+      href = res.str;
+      pos = res.pos;
 
       // [link](  <href>  "title"  )
       //                ^^ skipping these spaces

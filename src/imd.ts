@@ -1,16 +1,18 @@
 // 主解析器类
-
+import * as utils from "./common/utils.js";
+import * as helpers from "./helpers/index.js";
 import Renderer from "./renderer.js";
 import ParserCore from "./parser_core.js";
 import ParserBlock from "./parser_block.js";
 import ParserInline from "./parser_inline.js";
-
 export class IMarkdown {
   inline: ParserInline;
   block: ParserBlock;
   core: ParserCore;
   renderer: Renderer;
   options: any;
+  utils: typeof utils;
+  helpers: typeof helpers;
 
   constructor() {
     this.inline = new ParserInline();
@@ -18,6 +20,8 @@ export class IMarkdown {
     this.core = new ParserCore();
     this.renderer = new Renderer();
     this.options = {};
+    this.utils = utils;
+    this.helpers = utils.assign({}, helpers);
   }
 
   parse(src: string, env: any): any[] {

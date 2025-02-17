@@ -16,7 +16,6 @@ export default function image(state: StateInline, silent) {
   if (state.src.charCodeAt(state.pos + 1) !== 0x5b /* [ */) {
     return false;
   }
-
   const labelStart = state.pos + 2;
   const labelEnd = state.md.helpers.parseLinkLabel(state, state.pos + 1, false);
 
@@ -24,7 +23,6 @@ export default function image(state: StateInline, silent) {
   if (labelEnd < 0) {
     return false;
   }
-
   pos = labelEnd + 1;
   if (pos < max && state.src.charCodeAt(pos) === 0x28 /* ( */) {
     //
@@ -40,21 +38,17 @@ export default function image(state: StateInline, silent) {
         break;
       }
     }
+    // console.log("lll");
     if (pos >= max) {
       return false;
     }
-
     // [link](  <href>  "title"  )
     //          ^^^^^^ parsing link destination
     start = pos;
     res = state.md.helpers.parseLinkDestination(state.src, pos, state.posMax);
     if (res.ok) {
-      href = state.md.normalizeLink(res.str);
-      if (state.md.validateLink(href)) {
-        pos = res.pos;
-      } else {
-        href = "";
-      }
+      href = res.str;
+      pos = res.pos;
     }
 
     // [link](  <href>  "title"  )
@@ -132,22 +126,21 @@ export default function image(state: StateInline, silent) {
   //
   if (!silent) {
     content = state.src.slice(labelStart, labelEnd);
-
+    // console.log(content);
     const tokens = [];
     state.md.inline.parse(content, state.md, state.env, tokens);
 
     const token = state.push("image", "img", 0);
     const attrs = [
       ["src", href],
-      ["alt", ""],
+      ["alt", content],
     ];
     token.attrs = attrs;
     token.children = tokens;
     token.content = content;
-
-    if (title) {
-      attrs.push(["title", title]);
-    }
+    // if (title) {
+    //   attrs.push(["title", title]);
+    // }
   }
 
   state.pos = pos;

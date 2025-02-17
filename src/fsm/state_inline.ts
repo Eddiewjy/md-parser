@@ -2,11 +2,12 @@
 
 import Token from "../token.js";
 import { isWhiteSpace, isPunctChar, isMdAsciiPunct } from "../common/utils.js";
+import { IMarkdown } from "../imd.js";
 
 export default class StateInline {
   src: string;
   env: any;
-  md: any;
+  md: IMarkdown;
   tokens: Token[]; //输出的标记
   tokens_meta: any[]; //元数据
   pos: number; //当前位置
