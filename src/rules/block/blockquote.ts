@@ -1,8 +1,14 @@
 // 块引用 > blockquote
 
 import { isSpace } from "../../common/utils.js";
+import StateBlock from "../../fsm/state_block.js";
 
-export default function blockquote(state, startLine, endLine, silent) {
+export default function blockquote(
+  state: StateBlock,
+  startLine: number,
+  endLine: number,
+  silent
+) {
   let pos = state.bMarks[startLine] + state.tShift[startLine];
   let max = state.eMarks[startLine];
 
@@ -194,7 +200,7 @@ export default function blockquote(state, startLine, endLine, silent) {
 
   const token_o = state.push("blockquote_open", "blockquote", 1);
   token_o.markup = ">";
-  const lines = [startLine, 0];
+  const lines: [number, number] = [startLine, 0];
   token_o.map = lines;
 
   state.md.block.tokenize(state, startLine, nextLine);

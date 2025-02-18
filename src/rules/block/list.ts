@@ -1,9 +1,11 @@
 // 有序列表和无序列表
 
 import { isSpace } from "../../common/utils.js";
+import StateBlock from "../../fsm/state_block.js";
+import Token from "../../token.js";
 
 // 搜索 `[-+*][\n ]`，成功时返回标记后的下一个位置，否则返回 -1。
-function skipBulletListMarker(state, startLine) {
+function skipBulletListMarker(state: StateBlock, startLine) {
   const max = state.eMarks[startLine];
   let pos = state.bMarks[startLine] + state.tShift[startLine];
 
@@ -30,7 +32,7 @@ function skipBulletListMarker(state, startLine) {
 }
 
 // 搜索 `\d+[.)][\n ]`，成功时返回标记后的下一个位置，否则返回 -1。
-function skipOrderedListMarker(state, startLine) {
+function skipOrderedListMarker(state: StateBlock, startLine) {
   const start = state.bMarks[startLine] + state.tShift[startLine];
   const max = state.eMarks[startLine];
   let pos = start;
@@ -83,7 +85,7 @@ function skipOrderedListMarker(state, startLine) {
   return pos;
 }
 
-function markTightParagraphs(state, idx) {
+function markTightParagraphs(state: StateBlock, idx) {
   const level = state.level + 2;
 
   for (let i = idx + 2, l = state.tokens.length - 2; i < l; i++) {
@@ -98,8 +100,13 @@ function markTightParagraphs(state, idx) {
   }
 }
 
-export default function list(state, startLine, endLine, silent) {
-  let max, pos, start, token;
+export default function list(
+  state: StateBlock,
+  startLine: number,
+  endLine: number,
+  silent
+) {
+  let max, pos, start, token: Token;
   let nextLine = startLine;
   let tight = true;
 
@@ -137,9 +144,9 @@ export default function list(state, startLine, endLine, silent) {
   }
 
   // 检测列表类型和标记后的位置
-  let isOrdered;
-  let markerValue;
-  let posAfterMarker;
+  let isOrdered: boolean;
+  let markerValue: number;
+  let posAfterMarker: number;
   if ((posAfterMarker = skipOrderedListMarker(state, nextLine)) >= 0) {
     isOrdered = true;
     start = state.bMarks[nextLine] + state.tShift[nextLine];
@@ -173,13 +180,14 @@ export default function list(state, startLine, endLine, silent) {
   if (isOrdered) {
     token = state.push("ordered_list_open", "ol", 1);
     if (markerValue !== 1) {
-      token.attrs = [["start", markerValue]];
+      const string_marker = String(markerValue);
+      token.attrs = [["start", string_marker]];
     }
   } else {
     token = state.push("bullet_list_open", "ul", 1);
   }
 
-  const listLines = [nextLine, 0];
+  const listLines: [number, number] = [nextLine, 0];
   token.map = listLines;
   token.markup = String.fromCharCode(markerCharCode);
 
@@ -240,7 +248,7 @@ export default function list(state, startLine, endLine, silent) {
     // 运行子解析器并写入标记
     token = state.push("list_item_open", "li", 1);
     token.markup = String.fromCharCode(markerCharCode);
-    const itemLines = [nextLine, 0];
+    const itemLines: [number, number] = [nextLine, 0];
     token.map = itemLines;
     if (isOrdered) {
       token.info = state.src.slice(start, posAfterMarker - 1);
@@ -263,26 +271,26 @@ export default function list(state, startLine, endLine, silent) {
     state.tShift[nextLine] = contentStart - state.bMarks[nextLine];
     state.sCount[nextLine] = offset;
 
-    if (contentStart >= max && state.isEmpty(nextLine + 1)) {
-      // 解决此情况的变通方法
-      // （列表项为空，列表在 "foo" 之前终止）：
-      // ~~~~~~~~
-      //   -
-      //
-      //     foo
-      // ~~~~~~~~
-      state.line = Math.min(state.line + 2, endLine);
-    } else {
-      state.md.block.tokenize(state, nextLine, endLine, true);
-    }
+    // if (contentStart >= max && state.isEmpty(nextLine + 1)) {
+    //   // 解决此情况的变通方法
+    //   // （列表项为空，列表在 "foo" 之前终止）：
+    //   // ~~~~~~~~
+    //   //   -
+    //   //
+    //   //     foo
+    //   // ~~~~~~~~
+    //   state.line = Math.min(state.line + 2, endLine);
+    // } else {
+    state.md.block.tokenize(state, nextLine, endLine);
+    // }
 
-    // 如果任何列表项是紧凑的，则将列表标记为紧凑
-    if (!state.tight || prevEmptyEnd) {
-      tight = false;
-    }
-    // 如果以空行结束，则项目变为松散，
-    // 但我们应过滤最后一个元素，因为它表示列表结束
-    prevEmptyEnd = state.line - nextLine > 1 && state.isEmpty(state.line - 1);
+    // // 如果任何列表项是紧凑的，则将列表标记为紧凑
+    // if (!state.tight || prevEmptyEnd) {
+    //   tight = false;
+    // }
+    // // 如果以空行结束，则项目变为松散，
+    // // 但我们应过滤最后一个元素，因为它表示列表结束
+    // prevEmptyEnd = state.line - nextLine > 1 && state.isEmpty(state.line - 1);
 
     state.blkIndent = state.listIndent;
     state.listIndent = oldListIndent;
@@ -360,6 +368,6 @@ export default function list(state, startLine, endLine, silent) {
   if (tight) {
     markTightParagraphs(state, listTokIdx);
   }
-
+  // console.log(state.tokens);
   return true;
 }

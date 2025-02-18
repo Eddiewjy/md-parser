@@ -6,7 +6,7 @@ import { IMarkdown } from "../imd.js";
 
 export default class StateBlock {
   src: string;
-  md: any;
+  md: IMarkdown;
   env: any;
   tokens: Token[];
   bMarks: number[];

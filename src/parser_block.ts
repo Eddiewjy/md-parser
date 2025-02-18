@@ -68,10 +68,19 @@ export default class ParserBlock {
   tokenize(state: StateBlock, startLine: number, endLine: number): void {
     const rules = this.ruler.getRules("");
     let line = startLine;
+    let hasEmptyLines = false;
 
     while (line < endLine) {
       state.line = line = state.skipEmptyLines(line);
       if (line >= endLine) break;
+      if (state.sCount[line] < state.blkIndent) {
+        break;
+      }
+
+      if (state.level >= 20) {
+        state.line = endLine;
+        break;
+      }
 
       const prevLine = state.line;
       let matched = false;
@@ -89,6 +98,11 @@ export default class ParserBlock {
       if (!matched) throw new Error("没有匹配的块规则");
 
       line = state.line;
+      if (line < endLine && state.isEmpty(line)) {
+        hasEmptyLines = true;
+        line++;
+        state.line = line;
+      }
     }
   }
 

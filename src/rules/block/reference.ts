@@ -1,6 +1,12 @@
 import { isSpace, normalizeReference } from "../../common/utils.js";
+import StateBlock from "../../fsm/state_block.js";
 
-export default function reference(state, startLine, _endLine, silent) {
+export default function reference(
+  state: StateBlock,
+  startLine: number,
+  _endLine,
+  silent
+) {
   let pos = state.bMarks[startLine] + state.tShift[startLine];
   let max = state.eMarks[startLine];
   let nextLine = startLine + 1;
@@ -124,11 +130,7 @@ export default function reference(state, startLine, _endLine, silent) {
     return false;
   }
 
-  const href = state.md.normalizeLink(destRes.str);
-  if (!state.md.validateLink(href)) {
-    return false;
-  }
-
+  const href = destRes.str;
   pos = destRes.pos;
 
   // save cursor state, we could require to rollback later
