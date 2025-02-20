@@ -1,6 +1,6 @@
 {
   "name": "md-markdown-parser",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./dist/index.cjs",
   "scripts": {
     "test": "jest",
@@ -24,7 +24,8 @@
   "ts-node": {
     "files": [
       "src/",
-      "dist/"]
+      "dist/"
+    ]
   },
   "module": "./dist/index.mjs",
   "exports": {
