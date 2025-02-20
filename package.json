@@ -30,7 +30,7 @@
   "module": "./dist/index.mjs",
   "exports": {
     "import": "./dist/index.mjs",
-    "require": "./dist/index.cjs"
+    "require": "./dist/index.js"
   },
   "dependencies": {
     "entities": "^6.0.0",
