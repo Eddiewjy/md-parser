@@ -1,7 +1,7 @@
 {
   "name": "md-markdown-parser",
   "version": "1.0.2",
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "jest",
     "build": "tsc --project tsconfig.json",
