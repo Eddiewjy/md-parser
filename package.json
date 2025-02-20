@@ -1,5 +1,5 @@
 {
-  "name": "md-parser",
+  "name": "md-markdown-parser",
   "version": "1.0.0",
   "main": "./dist/index.cjs",
   "scripts": {
@@ -22,7 +22,9 @@
     "typescript": "^5.7.3"
   },
   "ts-node": {
-    "files": true
+    "files": [
+      "src/",
+      "dist/"]
   },
   "module": "./dist/index.mjs",
   "exports": {
@@ -33,5 +35,8 @@
     "entities": "^6.0.0",
     "mdurl": "^2.0.0",
     "uc.micro": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
