@@ -27,9 +27,9 @@
       "dist/"
     ]
   },
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "exports": {
-    "import": "./dist/index.mjs",
+    "import": "./dist/index.js",
     "require": "./dist/index.js"
   },
   "dependencies": {
