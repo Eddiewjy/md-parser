@@ -1,7 +1,10 @@
+"use strict";
 // Parse link destination
 //
-import { unescapeAll } from "../common/utils.js";
-export default function parseLinkDestination(str, start, max) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = parseLinkDestination;
+const utils_js_1 = require("../common/utils.js");
+function parseLinkDestination(str, start, max) {
     let code;
     let pos = start;
     const result = {
@@ -21,7 +24,7 @@ export default function parseLinkDestination(str, start, max) {
             }
             if (code === 0x3e /* > */) {
                 result.pos = pos + 1;
-                result.str = unescapeAll(str.slice(start + 1, pos));
+                result.str = (0, utils_js_1.unescapeAll)(str.slice(start + 1, pos));
                 result.ok = true;
                 return result;
             }
@@ -72,7 +75,7 @@ export default function parseLinkDestination(str, start, max) {
     if (level !== 0) {
         return result;
     }
-    result.str = unescapeAll(str.slice(start, pos));
+    result.str = (0, utils_js_1.unescapeAll)(str.slice(start, pos));
     result.pos = pos;
     result.ok = true;
     return result;

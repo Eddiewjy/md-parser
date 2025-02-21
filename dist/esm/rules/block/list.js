@@ -1,5 +1,8 @@
+"use strict";
 // 有序列表和无序列表
-import { isSpace } from "../../common/utils.js";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = list;
+const utils_js_1 = require("../../common/utils.js");
 // 搜索 `[-+*][\n ]`，成功时返回标记后的下一个位置，否则返回 -1。
 function skipBulletListMarker(state, startLine) {
     const max = state.eMarks[startLine];
@@ -13,7 +16,7 @@ function skipBulletListMarker(state, startLine) {
     }
     if (pos < max) {
         const ch = state.src.charCodeAt(pos);
-        if (!isSpace(ch)) {
+        if (!(0, utils_js_1.isSpace)(ch)) {
             // " -test " - 不是列表项
             return -1;
         }
@@ -55,7 +58,7 @@ function skipOrderedListMarker(state, startLine) {
     }
     if (pos < max) {
         ch = state.src.charCodeAt(pos);
-        if (!isSpace(ch)) {
+        if (!(0, utils_js_1.isSpace)(ch)) {
             // " 1.test " - 不是列表项
             return -1;
         }
@@ -73,7 +76,7 @@ function markTightParagraphs(state, idx) {
         }
     }
 }
-export default function list(state, startLine, endLine, silent) {
+function list(state, startLine, endLine, silent) {
     let max, pos, start, token;
     let nextLine = startLine;
     let tight = true;

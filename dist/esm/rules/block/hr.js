@@ -1,6 +1,9 @@
+"use strict";
 // 水平线 ---, ***, ___
-import { isSpace } from "../../common/utils.js";
-export default function hr(state, startLine, endLine, silent) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = hr;
+const utils_js_1 = require("../../common/utils.js");
+function hr(state, startLine, endLine, silent) {
     const max = state.eMarks[startLine];
     // 如果缩进超过3个空格，则应为代码块
     if (state.sCount[startLine] - state.blkIndent >= 4) {
@@ -18,7 +21,7 @@ export default function hr(state, startLine, endLine, silent) {
     let cnt = 1;
     while (pos < max) {
         const ch = state.src.charCodeAt(pos++);
-        if (ch !== marker && !isSpace(ch)) {
+        if (ch !== marker && !(0, utils_js_1.isSpace)(ch)) {
             return false;
         }
         if (ch === marker) {

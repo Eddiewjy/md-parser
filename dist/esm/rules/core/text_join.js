@@ -1,5 +1,8 @@
+"use strict";
 //拼接相邻的文本节点
-export default function text_join(state) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = text_join;
+function text_join(state) {
     let curr, last;
     const blockTokens = state.tokens;
     const l = blockTokens.length;

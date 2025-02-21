@@ -1,5 +1,8 @@
+"use strict";
 // fences (``` lang, ~~~ lang) 代码块
-export default function fence(state, startLine, endLine, silent) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = fence;
+function fence(state, startLine, endLine, silent) {
     let pos = state.bMarks[startLine] + state.tShift[startLine];
     let max = state.eMarks[startLine];
     // if it's indented more than 3 spaces, it should be a code block

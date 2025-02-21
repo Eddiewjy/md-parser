@@ -1,5 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 // Token 类表示词法分析中的一个标记
-export default class Token {
+class Token {
     constructor(type, tag, nesting) {
         this.type = type; // 标记的类型，例如 "paragraph_open"
         this.tag = tag; // HTML 标签名，例如 "p"
@@ -68,3 +70,4 @@ export default class Token {
         }
     }
 }
+exports.default = Token;

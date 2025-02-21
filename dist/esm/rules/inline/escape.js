@@ -1,6 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = escape;
 // Process escaped chars and hardbreaks
 //转义字符和硬换行符（\\ 转义符和换行符）
-import { isSpace } from "../../common/utils.js";
+const utils_js_1 = require("../../common/utils.js");
 const ESCAPED = [];
 for (let i = 0; i < 256; i++) {
     ESCAPED.push(0);
@@ -8,7 +11,7 @@ for (let i = 0; i < 256; i++) {
 "\\!\"#$%&'()*+,./:;<=>?@[]^_`{|}~-".split("").forEach(function (ch) {
     ESCAPED[ch.charCodeAt(0)] = 1;
 });
-export default function escape(state, silent) {
+function escape(state, silent) {
     let pos = state.pos;
     const max = state.posMax;
     if (state.src.charCodeAt(pos) !== 0x5c /* \ */)
@@ -26,7 +29,7 @@ export default function escape(state, silent) {
         // skip leading whitespaces from next line
         while (pos < max) {
             ch1 = state.src.charCodeAt(pos);
-            if (!isSpace(ch1))
+            if (!(0, utils_js_1.isSpace)(ch1))
                 break;
             pos++;
         }

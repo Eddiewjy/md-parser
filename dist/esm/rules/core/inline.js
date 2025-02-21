@@ -1,4 +1,7 @@
-export default function inline(state) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = inline;
+function inline(state) {
     const tokens = state.tokens;
     // 解析内联元素
     for (let i = 0, l = tokens.length; i < l; i++) {

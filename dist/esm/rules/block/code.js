@@ -1,5 +1,8 @@
+"use strict";
 // Code block (4 spaces padded)
-export default function code(state, startLine, endLine /*, silent */) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = code;
+function code(state, startLine, endLine /*, silent */) {
     if (state.sCount[startLine] - state.blkIndent < 4) {
         return false;
     }

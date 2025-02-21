@@ -1,10 +1,15 @@
+"use strict";
 // 用于解析内联元素（例如强调、链接、代码等）的状态机。
-import Token from "../token.js";
-import { isWhiteSpace, isPunctChar, isMdAsciiPunct } from "../common/utils.js";
-export default class StateInline {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const token_js_1 = __importDefault(require("../token.js"));
+const utils_js_1 = require("../common/utils.js");
+class StateInline {
     constructor(src, md, env, outTokens) {
         // 重新导出 Token 类以在块规则中使用
-        this.Token = Token;
+        this.Token = token_js_1.default;
         this.src = src;
         this.env = env;
         this.md = md;
@@ -30,7 +35,7 @@ export default class StateInline {
     }
     // 刷新待处理文本
     pushPending() {
-        const token = new Token("text", "", 0);
+        const token = new token_js_1.default("text", "", 0);
         token.content = this.pending;
         token.level = this.pendingLevel;
         this.tokens.push(token);
@@ -43,7 +48,7 @@ export default class StateInline {
         if (this.pending) {
             this.pushPending();
         }
-        const token = new Token(type, tag, nesting);
+        const token = new token_js_1.default(type, tag, nesting);
         let token_meta = null;
         if (nesting < 0) {
             // 关闭标签
@@ -79,10 +84,10 @@ export default class StateInline {
         const count = pos - start;
         // 将行的结尾视为空白
         const nextChar = pos < max ? this.src.charCodeAt(pos) : 0x20;
-        const isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar));
-        const isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar));
-        const isLastWhiteSpace = isWhiteSpace(lastChar);
-        const isNextWhiteSpace = isWhiteSpace(nextChar);
+        const isLastPunctChar = (0, utils_js_1.isMdAsciiPunct)(lastChar) || (0, utils_js_1.isPunctChar)(String.fromCharCode(lastChar));
+        const isNextPunctChar = (0, utils_js_1.isMdAsciiPunct)(nextChar) || (0, utils_js_1.isPunctChar)(String.fromCharCode(nextChar));
+        const isLastWhiteSpace = (0, utils_js_1.isWhiteSpace)(lastChar);
+        const isNextWhiteSpace = (0, utils_js_1.isWhiteSpace)(nextChar);
         const left_flanking = !isNextWhiteSpace &&
             (!isNextPunctChar || isLastWhiteSpace || isLastPunctChar);
         const right_flanking = !isLastWhiteSpace &&
@@ -92,3 +97,4 @@ export default class StateInline {
         return { can_open, can_close, length: count };
     }
 }
+exports.default = StateInline;

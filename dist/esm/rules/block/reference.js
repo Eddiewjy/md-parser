@@ -1,5 +1,8 @@
-import { isSpace, normalizeReference } from "../../common/utils.js";
-export default function reference(state, startLine, _endLine, silent) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = reference;
+const utils_js_1 = require("../../common/utils.js");
+function reference(state, startLine, _endLine, silent) {
     let pos = state.bMarks[startLine] + state.tShift[startLine];
     let max = state.eMarks[startLine];
     let nextLine = startLine + 1;
@@ -96,7 +99,7 @@ export default function reference(state, startLine, _endLine, silent) {
                 nextLine++;
             }
         }
-        else if (isSpace(ch)) {
+        else if ((0, utils_js_1.isSpace)(ch)) {
             /* eslint no-empty:0 */
         }
         else {
@@ -127,7 +130,7 @@ export default function reference(state, startLine, _endLine, silent) {
                 nextLine++;
             }
         }
-        else if (isSpace(ch)) {
+        else if ((0, utils_js_1.isSpace)(ch)) {
             /* eslint no-empty:0 */
         }
         else {
@@ -160,7 +163,7 @@ export default function reference(state, startLine, _endLine, silent) {
     // skip trailing spaces until the rest of the line
     while (pos < max) {
         const ch = str.charCodeAt(pos);
-        if (!isSpace(ch)) {
+        if (!(0, utils_js_1.isSpace)(ch)) {
             break;
         }
         pos++;
@@ -174,7 +177,7 @@ export default function reference(state, startLine, _endLine, silent) {
             nextLine = destEndLineNo;
             while (pos < max) {
                 const ch = str.charCodeAt(pos);
-                if (!isSpace(ch)) {
+                if (!(0, utils_js_1.isSpace)(ch)) {
                     break;
                 }
                 pos++;
@@ -185,7 +188,7 @@ export default function reference(state, startLine, _endLine, silent) {
         // garbage at the end of the line
         return false;
     }
-    const label = normalizeReference(str.slice(1, labelEnd));
+    const label = (0, utils_js_1.normalizeReference)(str.slice(1, labelEnd));
     if (!label) {
         // CommonMark 0.20 disallows empty labels
         return false;

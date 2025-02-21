@@ -1,52 +1,57 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /** 内部实现
  * class ParserBlock
  *
  * 块级解析器。
  **/
 //这里rule的参数要包括起始行和结束行，因为块级解析器是一块一块解析的
-import Ruler from "./ruler.js";
-import StateBlock from "./fsm/state_block.js";
-import r_paragraph from "./rules/block/paragraph.js";
-import r_heading from "./rules/block/heading.js";
-import r_list from "./rules/block/list.js";
-import r_table from "./rules/block/table.js";
-import r_blockquote from "./rules/block/blockquote.js";
-import r_hr from "./rules/block/hr.js";
-import r_code from "./rules/block/code.js";
-import r_fence from "./rules/block/fence.js";
-import r_reference from "./rules/block/reference.js";
-import r_html_block from "./rules/block/html_block.js";
-import r_lheading from "./rules/block/lheading.js";
+const ruler_js_1 = __importDefault(require("./ruler.js"));
+const state_block_js_1 = __importDefault(require("./fsm/state_block.js"));
+const paragraph_js_1 = __importDefault(require("./rules/block/paragraph.js"));
+const heading_js_1 = __importDefault(require("./rules/block/heading.js"));
+const list_js_1 = __importDefault(require("./rules/block/list.js"));
+const table_js_1 = __importDefault(require("./rules/block/table.js"));
+const blockquote_js_1 = __importDefault(require("./rules/block/blockquote.js"));
+const hr_js_1 = __importDefault(require("./rules/block/hr.js"));
+const code_js_1 = __importDefault(require("./rules/block/code.js"));
+const fence_js_1 = __importDefault(require("./rules/block/fence.js"));
+const reference_js_1 = __importDefault(require("./rules/block/reference.js"));
+const html_block_js_1 = __importDefault(require("./rules/block/html_block.js"));
+const lheading_js_1 = __importDefault(require("./rules/block/lheading.js"));
 // 定义核心解析规则
 const _rules = [
-    ["table", r_table, ["paragraph", "reference"]],
-    ["code", r_code],
-    ["fence", r_fence, ["paragraph", "reference", "blockquote", "list"]],
+    ["table", table_js_1.default, ["paragraph", "reference"]],
+    ["code", code_js_1.default],
+    ["fence", fence_js_1.default, ["paragraph", "reference", "blockquote", "list"]],
     [
         "blockquote",
-        r_blockquote,
+        blockquote_js_1.default,
         ["paragraph", "reference", "blockquote", "list"],
     ],
-    ["hr", r_hr, ["paragraph", "reference", "blockquote", "list"]],
-    ["list", r_list, ["paragraph", "reference", "blockquote"]],
-    ["reference", r_reference],
-    ["html_block", r_html_block, ["paragraph", "reference", "blockquote"]],
-    ["heading", r_heading, ["paragraph", "reference", "blockquote"]],
-    ["lheading", r_lheading],
-    ["paragraph", r_paragraph],
+    ["hr", hr_js_1.default, ["paragraph", "reference", "blockquote", "list"]],
+    ["list", list_js_1.default, ["paragraph", "reference", "blockquote"]],
+    ["reference", reference_js_1.default],
+    ["html_block", html_block_js_1.default, ["paragraph", "reference", "blockquote"]],
+    ["heading", heading_js_1.default, ["paragraph", "reference", "blockquote"]],
+    ["lheading", lheading_js_1.default],
+    ["paragraph", paragraph_js_1.default],
 ];
 /**
  * 块级解析器
  */
-export default class ParserBlock {
+class ParserBlock {
     constructor() {
-        this.ruler = new Ruler();
+        this.ruler = new ruler_js_1.default();
         for (const [name, rule, alt] of _rules) {
             this.ruler.push(name, rule, {
                 alt: alt ? [...alt] : [],
             });
         }
-        this.State = StateBlock;
+        this.State = state_block_js_1.default;
     }
     /**
      * 解析输入范围并生成 Token
@@ -104,3 +109,4 @@ export default class ParserBlock {
         this.tokenize(state, state.line, state.lineMax);
     }
 }
+exports.default = ParserBlock;

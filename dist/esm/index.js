@@ -1,4 +1,7 @@
-import { IMarkdown } from "./imd.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getParserInstance = getParserInstance;
+const imd_js_1 = require("./imd.js");
 // 规则映射对象
 const ruleMap = {
     headings: ["heading"],
@@ -16,7 +19,7 @@ const ruleMap = {
     taskLists: ["taskList"],
 };
 // getParserInstance 接口
-export function getParserInstance(options) {
+function getParserInstance(options) {
     const { features, codeBlock, security, performance } = options;
     // 根据选项动态配置解析器的行为
     const parserOptions = {
@@ -25,7 +28,7 @@ export function getParserInstance(options) {
         security: security || {},
         performance: performance || {},
     };
-    const md = new IMarkdown();
+    const md = new imd_js_1.IMarkdown();
     const enableList = [];
     const disableList = [];
     // 遍历 features 并根据值推入 enableList 或 disableList

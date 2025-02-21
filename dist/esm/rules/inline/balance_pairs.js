@@ -1,5 +1,8 @@
+"use strict";
 // For each opening emphasis-like marker find a matching closing one
 //
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = link_pairs;
 function processDelimiters(delimiters) {
     const openersBottom = {};
     const max = delimiters.length;
@@ -92,7 +95,7 @@ function processDelimiters(delimiters) {
         }
     }
 }
-export default function link_pairs(state) {
+function link_pairs(state) {
     // console.log("lll");
     const tokens_meta = state.tokens_meta;
     const max = state.tokens_meta.length;

@@ -1,6 +1,11 @@
+"use strict";
 // 用于解析块级元素的状态类
-import Token from "../token.js";
-import { isSpace } from "../common/utils.js";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const token_js_1 = __importDefault(require("../token.js"));
+const utils_js_1 = require("../common/utils.js");
 class StateBlock {
     constructor(src, md, env, tokens) {
         this.src = src;
@@ -30,7 +35,7 @@ class StateBlock {
         for (let start = 0, pos = 0, indent = 0, offset = 0, len = s.length, indent_found = false; pos < len; pos++) {
             const ch = s.charCodeAt(pos);
             if (!indent_found) {
-                if (isSpace(ch)) {
+                if ((0, utils_js_1.isSpace)(ch)) {
                     indent++;
                     if (ch === 0x09) {
                         offset += 4 - (offset % 4);
@@ -69,7 +74,7 @@ class StateBlock {
     }
     // 推送新标记到“token流”中。
     push(type, tag, nesting) {
-        const token = new Token(type, tag, nesting);
+        const token = new token_js_1.default(type, tag, nesting);
         token.block = true;
         if (nesting < 0)
             this.level--; // 关闭标签
@@ -94,7 +99,7 @@ class StateBlock {
     skipSpaces(pos) {
         for (let max = this.src.length; pos < max; pos++) {
             const ch = this.src.charCodeAt(pos);
-            if (!isSpace(ch)) {
+            if (!(0, utils_js_1.isSpace)(ch)) {
                 break;
             }
         }
@@ -106,7 +111,7 @@ class StateBlock {
             return pos;
         }
         while (pos > min) {
-            if (!isSpace(this.src.charCodeAt(--pos))) {
+            if (!(0, utils_js_1.isSpace)(this.src.charCodeAt(--pos))) {
                 return pos + 1;
             }
         }
@@ -153,7 +158,7 @@ class StateBlock {
             }
             while (first < last && lineIndent < indent) {
                 const ch = this.src.charCodeAt(first);
-                if (isSpace(ch)) {
+                if ((0, utils_js_1.isSpace)(ch)) {
                     if (ch === 0x09) {
                         lineIndent += 4 - ((lineIndent + this.bsCount[line]) % 4);
                     }
@@ -185,5 +190,5 @@ class StateBlock {
     }
 }
 // 重新导出 Token 类以在块规则中使用
-StateBlock.Token = Token;
-export default StateBlock;
+StateBlock.Token = token_js_1.default;
+exports.default = StateBlock;

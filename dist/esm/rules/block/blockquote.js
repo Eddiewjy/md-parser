@@ -1,6 +1,9 @@
+"use strict";
 // 块引用 > blockquote
-import { isSpace } from "../../common/utils.js";
-export default function blockquote(state, startLine, endLine, silent) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = blockquote;
+const utils_js_1 = require("../../common/utils.js");
+function blockquote(state, startLine, endLine, silent) {
     let pos = state.bMarks[startLine] + state.tShift[startLine];
     let max = state.eMarks[startLine];
     const oldLineMax = state.lineMax;
@@ -99,7 +102,7 @@ export default function blockquote(state, startLine, endLine, silent) {
             state.bMarks[nextLine] = pos;
             while (pos < max) {
                 const ch = state.src.charCodeAt(pos);
-                if (isSpace(ch)) {
+                if ((0, utils_js_1.isSpace)(ch)) {
                     if (ch === 0x09) {
                         offset +=
                             4 -

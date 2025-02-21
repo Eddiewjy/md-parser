@@ -1,4 +1,6 @@
-import { assign, unescapeAll, escapeHtml } from "./common/utils.js";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const utils_js_1 = require("./common/utils.js");
 const default_rules = {};
 // 渲染内联代码
 default_rules.code_inline = function (tokens, idx, options, env, slf) {
@@ -6,7 +8,7 @@ default_rules.code_inline = function (tokens, idx, options, env, slf) {
     return ("<code" +
         slf.renderAttrs(token) +
         ">" +
-        escapeHtml(token.content) +
+        (0, utils_js_1.escapeHtml)(token.content) +
         "</code>");
 };
 // 渲染代码块
@@ -15,13 +17,13 @@ default_rules.code_block = function (tokens, idx, options, env, slf) {
     return ("<pre" +
         slf.renderAttrs(token) +
         "><code>" +
-        escapeHtml(tokens[idx].content) +
+        (0, utils_js_1.escapeHtml)(tokens[idx].content) +
         "</code></pre>\n");
 };
 // 渲染带有语言高亮的代码块
 default_rules.fence = function (tokens, idx, options, env, slf) {
     const token = tokens[idx];
-    const info = token.info ? unescapeAll(token.info).trim() : "";
+    const info = token.info ? (0, utils_js_1.unescapeAll)(token.info).trim() : "";
     let langName = "";
     let langAttrs = "";
     if (info) {
@@ -33,10 +35,10 @@ default_rules.fence = function (tokens, idx, options, env, slf) {
     if (options.highlight) {
         highlighted =
             options.highlight(token.content, langName, langAttrs) ||
-                escapeHtml(token.content);
+                (0, utils_js_1.escapeHtml)(token.content);
     }
     else {
-        highlighted = escapeHtml(token.content);
+        highlighted = (0, utils_js_1.escapeHtml)(token.content);
     }
     if (highlighted.indexOf("<pre") === 0) {
         return highlighted + "\n";
@@ -60,7 +62,7 @@ default_rules.fence = function (tokens, idx, options, env, slf) {
 };
 // 渲染文本
 default_rules.text = function (tokens, idx /*, options, env */) {
-    return escapeHtml(tokens[idx].content);
+    return (0, utils_js_1.escapeHtml)(tokens[idx].content);
 };
 // 渲染 HTML 块
 default_rules.html_block = function (tokens, idx /*, options, env */) {
@@ -71,9 +73,9 @@ default_rules.html_inline = function (tokens, idx /*, options, env */) {
     return tokens[idx].content;
 };
 // 创建新的 Renderer 实例，并填充默认的 rules
-export default class Renderer {
+class Renderer {
     constructor() {
-        this.rules = assign({}, default_rules);
+        this.rules = (0, utils_js_1.assign)({}, default_rules);
     }
     // 渲染 token 的属性为字符串
     renderAttrs(token) {
@@ -81,7 +83,7 @@ export default class Renderer {
             return "";
         }
         return token.attrs
-            .map((attr) => ` ${escapeHtml(attr[0])}="${escapeHtml(attr[1])}"`)
+            .map((attr) => ` ${(0, utils_js_1.escapeHtml)(attr[0])}="${(0, utils_js_1.escapeHtml)(attr[1])}"`)
             .join("");
     }
     // 默认的 token 渲染器
@@ -151,3 +153,4 @@ export default class Renderer {
         return result;
     }
 }
+exports.default = Renderer;

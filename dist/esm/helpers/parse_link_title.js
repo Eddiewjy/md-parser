@@ -1,10 +1,13 @@
+"use strict";
 // Parse link title
 //
-import { unescapeAll } from "../common/utils.js";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = parseLinkTitle;
+const utils_js_1 = require("../common/utils.js");
 // Parse link title within `str` in [start, max] range,
 // or continue previous parsing if `prev_state` is defined (equal to result of last execution).
 //
-export default function parseLinkTitle(str, start, max, prev_state) {
+function parseLinkTitle(str, start, max, prev_state) {
     let code;
     let pos = start;
     const state = {
@@ -47,7 +50,7 @@ export default function parseLinkTitle(str, start, max, prev_state) {
         code = str.charCodeAt(pos);
         if (code === state.marker) {
             state.pos = pos + 1;
-            state.str += unescapeAll(str.slice(start, pos));
+            state.str += (0, utils_js_1.unescapeAll)(str.slice(start, pos));
             state.ok = true;
             return state;
         }
@@ -61,6 +64,6 @@ export default function parseLinkTitle(str, start, max, prev_state) {
     }
     // no closing marker found, but this link title may continue on the next line (for references)
     state.can_continue = true;
-    state.str += unescapeAll(str.slice(start, pos));
+    state.str += (0, utils_js_1.unescapeAll)(str.slice(start, pos));
     return state;
 }

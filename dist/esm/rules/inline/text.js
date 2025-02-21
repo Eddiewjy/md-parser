@@ -1,5 +1,8 @@
+"use strict";
 // Skip text characters for text token, place those to pending buffer
 // and increment current pos
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = text;
 // 跳过纯文本的规则
 // '{}$%@~+=:' 保留用于扩展
 // !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, :, ;, <, =, >, ?, @, [, \, ], ^, _, `, {, |, }, 或 ~
@@ -35,7 +38,7 @@ function isTerminatorChar(ch) {
             return false;
     }
 }
-export default function text(state, silent) {
+function text(state, silent) {
     // console.log("lll");
     let pos = state.pos;
     while (pos < state.posMax && !isTerminatorChar(state.src.charCodeAt(pos))) {

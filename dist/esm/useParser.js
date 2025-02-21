@@ -1,5 +1,6 @@
+"use strict";
 // import { getParserInstance } from "./index.js";
-export {};
+Object.defineProperty(exports, "__esModule", { value: true });
 // const md = getParserInstance({
 //   features: {
 //     basic: {

@@ -1,3 +1,4 @@
+"use strict";
 // Clean up tokens after emphasis and strikethrough postprocessing:
 // merge adjacent text nodes into one and re-calculate all token levels
 //
@@ -6,7 +7,9 @@
 // leaves them as text (needed to merge with adjacent text) or turns them
 // into opening/closing tags (which messes up levels inside).
 //
-export default function fragments_join(state) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = fragments_join;
+function fragments_join(state) {
     let curr, last;
     let level = 0;
     const tokens = state.tokens;

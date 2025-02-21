@@ -1,4 +1,6 @@
+"use strict";
 // 解析 *this* 和 **this** 的强调标记，也支持 _this_ 和 __this__
+Object.defineProperty(exports, "__esModule", { value: true });
 // 插入每个标记作为单独的文本标记，并将其添加到分隔符列表中
 //
 function emphasis_tokenize(state, silent) {
@@ -80,7 +82,7 @@ function emphasis_post_process(state) {
         }
     }
 }
-export default {
+exports.default = {
     tokenize: emphasis_tokenize,
     postProcess: emphasis_post_process,
 };

@@ -1,5 +1,8 @@
-import { normalizeReference, isSpace } from "../../common/utils.js";
-export default function image(state, silent) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = image;
+const utils_js_1 = require("../../common/utils.js");
+function image(state, silent) {
     let code, content, label, pos, ref, res, title, start;
     let href = "";
     const oldPos = state.pos;
@@ -26,7 +29,7 @@ export default function image(state, silent) {
         pos++;
         for (; pos < max; pos++) {
             code = state.src.charCodeAt(pos);
-            if (!isSpace(code) && code !== 0x0a) {
+            if (!(0, utils_js_1.isSpace)(code) && code !== 0x0a) {
                 break;
             }
         }
@@ -47,7 +50,7 @@ export default function image(state, silent) {
         start = pos;
         for (; pos < max; pos++) {
             code = state.src.charCodeAt(pos);
-            if (!isSpace(code) && code !== 0x0a) {
+            if (!(0, utils_js_1.isSpace)(code) && code !== 0x0a) {
                 break;
             }
         }
@@ -61,7 +64,7 @@ export default function image(state, silent) {
             //                         ^^ skipping these spaces
             for (; pos < max; pos++) {
                 code = state.src.charCodeAt(pos);
-                if (!isSpace(code) && code !== 0x0a) {
+                if (!(0, utils_js_1.isSpace)(code) && code !== 0x0a) {
                     break;
                 }
             }
@@ -100,7 +103,7 @@ export default function image(state, silent) {
         if (!label) {
             label = state.src.slice(labelStart, labelEnd);
         }
-        ref = state.env.references[normalizeReference(label)];
+        ref = state.env.references[(0, utils_js_1.normalizeReference)(label)];
         if (!ref) {
             state.pos = oldPos;
             return false;

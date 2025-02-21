@@ -1,6 +1,9 @@
+"use strict";
 // 标题 (#, ##, ...)
-import { isSpace } from "../../common/utils.js";
-export default function heading(state, startLine, endLine, silent) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = heading;
+const utils_js_1 = require("../../common/utils.js");
+function heading(state, startLine, endLine, silent) {
     let pos = state.bMarks[startLine] + state.tShift[startLine]; // 当前行的开始位置
     let max = state.eMarks[startLine]; // 当前行的结束位置
     // 如果当前行的缩进超过 3 个空格，则认为是代码块，而不是标题
@@ -20,7 +23,7 @@ export default function heading(state, startLine, endLine, silent) {
         ch = state.src.charCodeAt(++pos);
     }
     // 如果标题级别超过 6，或者 `#` 后面没有空格，则不是有效标题
-    if (level > 6 || (pos < max && !isSpace(ch))) {
+    if (level > 6 || (pos < max && !(0, utils_js_1.isSpace)(ch))) {
         return false;
     }
     if (silent) {
@@ -29,7 +32,7 @@ export default function heading(state, startLine, endLine, silent) {
     // 去掉标题末尾的空格和 `#`
     max = state.skipSpacesBack(max, pos);
     const tmp = state.skipCharsBack(max, 0x23, pos); // #
-    if (tmp > pos && isSpace(state.src.charCodeAt(tmp - 1))) {
+    if (tmp > pos && (0, utils_js_1.isSpace)(state.src.charCodeAt(tmp - 1))) {
         max = tmp; // 如果标题后有空格，调整结束位置
     }
     state.line = startLine + 1; // 更新当前行号

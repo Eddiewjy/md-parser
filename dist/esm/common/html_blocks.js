@@ -1,6 +1,8 @@
+"use strict";
 //块级html元素
 // https://spec.commonmark.org/0.30/#html-blocks
-export default [
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = [
     'address',
     'article',
     'aside',

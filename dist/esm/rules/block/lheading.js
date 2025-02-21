@@ -1,5 +1,8 @@
+"use strict";
 // lheading (---, ===)
-export default function lheading(state, startLine, endLine /*, silent */) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = lheading;
+function lheading(state, startLine, endLine /*, silent */) {
     const terminatorRules = state.md.block.ruler.getRules("paragraph");
     // if it's indented more than 3 spaces, it should be a code block
     if (state.sCount[startLine] - state.blkIndent >= 4) {

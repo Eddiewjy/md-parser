@@ -1,3 +1,4 @@
+"use strict";
 /**
  * class Ruler 规则管理器
  *
@@ -8,7 +9,8 @@
  * - 启用/禁用规则
  * - 缓存启用规则的列表，以便快速查找
  **/
-export default class Ruler {
+Object.defineProperty(exports, "__esModule", { value: true });
+class Ruler {
     constructor() {
         this.__rules__ = [];
         this.__cache__ = null;
@@ -102,3 +104,4 @@ export default class Ruler {
         return this.__cache__[chainName] || [];
     }
 }
+exports.default = Ruler;

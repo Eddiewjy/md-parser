@@ -1,7 +1,10 @@
+"use strict";
 // Process links like https://example.org/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = linkify;
 // RFC3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 const SCHEME_RE = /(?:^|[^a-z0-9.+-])([a-z][a-z0-9.+-]*)$/i;
-export default function linkify(state, silent) {
+function linkify(state, silent) {
     if (!state.md.options.linkify)
         return false;
     if (state.linkLevel > 0)

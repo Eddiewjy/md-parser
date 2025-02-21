@@ -1,4 +1,7 @@
+"use strict";
 // 解析简单表格
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = table;
 function getLine(state, line) {
     const pos = state.bMarks[line] + state.tShift[line];
     const max = state.eMarks[line];
@@ -33,7 +36,7 @@ function escapedSplit(str) {
     result.push(current + str.substring(lastPos));
     return result;
 }
-export default function table(state, startLine, endLine, silent) {
+function table(state, startLine, endLine, silent) {
     // should have at least two lines
     if (startLine + 2 > endLine) {
         return false;

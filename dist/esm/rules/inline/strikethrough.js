@@ -1,5 +1,7 @@
+"use strict";
 // ~~strike through~~
 //
+Object.defineProperty(exports, "__esModule", { value: true });
 // Insert each marker as a separate text token, and add it to delimiter list
 //
 function strikethrough_tokenize(state, silent) {
@@ -101,7 +103,7 @@ function strikethrough_postProcess(state) {
         }
     }
 }
-export default {
+exports.default = {
     tokenize: strikethrough_tokenize,
     postProcess: strikethrough_postProcess,
 };

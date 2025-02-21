@@ -1,6 +1,12 @@
+"use strict";
 // HTML block
-import block_names from "../../common/html_blocks.js";
-import { HTML_OPEN_CLOSE_TAG_RE } from "../../common/html_re.js";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = html_block;
+const html_blocks_js_1 = __importDefault(require("../../common/html_blocks.js"));
+const html_re_js_1 = require("../../common/html_re.js");
 // An array of opening and corresponding closing sequences for html tags,
 // last argument defines whether it can terminate a paragraph or not
 //
@@ -15,13 +21,13 @@ const HTML_SEQUENCES = [
     [/^<![A-Z]/, />/, true],
     [/^<!\[CDATA\[/, /\]\]>/, true],
     [
-        new RegExp("^</?(" + block_names.join("|") + ")(?=(\\s|/?>|$))", "i"),
+        new RegExp("^</?(" + html_blocks_js_1.default.join("|") + ")(?=(\\s|/?>|$))", "i"),
         /^$/,
         true,
     ],
-    [new RegExp(HTML_OPEN_CLOSE_TAG_RE.source + "\\s*$"), /^$/, false],
+    [new RegExp(html_re_js_1.HTML_OPEN_CLOSE_TAG_RE.source + "\\s*$"), /^$/, false],
 ];
-export default function html_block(state, startLine, endLine, silent) {
+function html_block(state, startLine, endLine, silent) {
     let pos = state.bMarks[startLine] + state.tShift[startLine];
     let max = state.eMarks[startLine];
     // if it's indented more than 3 spaces, it should be a code block

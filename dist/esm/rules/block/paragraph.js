@@ -1,5 +1,8 @@
+"use strict";
 // 段落标签<p>
-export default function paragraph(state, startLine, endLine) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = paragraph;
+function paragraph(state, startLine, endLine) {
     const terminatorRules = state.md.block.ruler.getRules("paragraph");
     const oldParentType = state.parentType;
     let nextLine = startLine + 1;

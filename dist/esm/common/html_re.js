@@ -1,4 +1,7 @@
+"use strict";
 // 用于匹配 HTML 标签的正则表达式
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HTML_OPEN_CLOSE_TAG_RE = exports.HTML_TAG_RE = void 0;
 // 属性名称
 const attr_name = '[a-zA-Z_:][a-zA-Z0-9:._-]*';
 // 属性值（未加引号、单引号、双引号）
@@ -23,6 +26,7 @@ const declaration = '<![A-Za-z][^>]*>';
 const cdata = '<!\\[CDATA\\[[\\s\\S]*?\\]\\]>';
 // 匹配所有 HTML 标签
 const HTML_TAG_RE = new RegExp('^(?:' + open_tag + '|' + close_tag + '|' + comment + '|' + processing + '|' + declaration + '|' + cdata + ')');
+exports.HTML_TAG_RE = HTML_TAG_RE;
 // 匹配开标签和闭标签
 const HTML_OPEN_CLOSE_TAG_RE = new RegExp('^(?:' + open_tag + '|' + close_tag + ')');
-export { HTML_TAG_RE, HTML_OPEN_CLOSE_TAG_RE };
+exports.HTML_OPEN_CLOSE_TAG_RE = HTML_OPEN_CLOSE_TAG_RE;

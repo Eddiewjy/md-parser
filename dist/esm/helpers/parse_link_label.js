@@ -1,9 +1,12 @@
+"use strict";
 // Parse link label
 //
 // this function assumes that first character ("[") already matches;
 // returns the end of the label
 //
-export default function parseLinkLabel(state, start, disableNested) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = parseLinkLabel;
+function parseLinkLabel(state, start, disableNested) {
     let level, found, marker, prevPos;
     const max = state.posMax;
     const oldPos = state.pos;

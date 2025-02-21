@@ -1,6 +1,9 @@
+"use strict";
 // Proceess '\n'
-import { isSpace } from "../../common/utils.js";
-export default function newline(state, silent) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = newline;
+const utils_js_1 = require("../../common/utils.js");
+function newline(state, silent) {
     let pos = state.pos;
     if (state.src.charCodeAt(pos) !== 0x0a /* \n */) {
         return false;
@@ -32,7 +35,7 @@ export default function newline(state, silent) {
     }
     pos++;
     // skip heading spaces for next line
-    while (pos < max && isSpace(state.src.charCodeAt(pos))) {
+    while (pos < max && (0, utils_js_1.isSpace)(state.src.charCodeAt(pos))) {
         pos++;
     }
     state.pos = pos;
