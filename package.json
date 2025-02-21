@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "type": "module",
+
   "description": "",
   "devDependencies": {
     "@types/jest": "^29.5.14",
