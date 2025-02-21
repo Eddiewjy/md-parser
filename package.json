@@ -1,17 +1,18 @@
 {
-  "name": "md-parser",
-  "version": "1.0.0",
-  "main": "./dist/index.cjs",
+  "name": "md-markdown-parser",
+  "version": "1.1.0",
+  "main": "./dist/cjs/index.js",
   "scripts": {
     "test": "jest",
-    "build": "tsc --project tsconfig.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
     "start": "node dist/useParser.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "type": "module",
   "description": "",
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -22,16 +23,21 @@
     "typescript": "^5.7.3"
   },
   "ts-node": {
-    "files": true
+    "files": [
+      "dist/"
+    ]
   },
-  "module": "./dist/index.mjs",
+  "module": "./dist/esm/index.js",
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.cjs"
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
   },
   "dependencies": {
     "entities": "^6.0.0",
     "mdurl": "^2.0.0",
     "uc.micro": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
