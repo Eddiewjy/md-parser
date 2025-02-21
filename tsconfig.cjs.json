@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2020", // 将 TypeScript 编译成 ES2020 版本的 JavaScript
-    "module": "Node16", 
+    "module": "CommonJS", 
     "moduleResolution": "node16", // 使用 Node.js 模块解析策略
-    "outDir": "./dist", // 指定编译输出目录为 ./dist
+    "outDir": "./dist/cjs", // 指定编译输出目录为 ./dist
     "esModuleInterop": true, // 启用对 ES 模块的互操作性，允许默认导入
     "declaration": true, // 生成 .d.ts 声明文件
     "declarationMap": true, // 为声明文件生成 source map

@@ -1,10 +1,13 @@
 {
   "name": "md-markdown-parser",
   "version": "1.0.5",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
+  
   "scripts": {
     "test": "jest",
-    "build": "tsc --project tsconfig.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
     "start": "node dist/useParser.js",
     "prepublishOnly": "npm run build"
   },
@@ -23,14 +26,14 @@
   },
   "ts-node": {
     "files": [
-      "src/",
+      
       "dist/"
     ]
   },
-  "module": "./dist/index.js",
+  "module": "./dist/esm/index.js",
   "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.js"
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
   },
   "dependencies": {
     "entities": "^6.0.0",
