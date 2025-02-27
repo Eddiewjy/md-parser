@@ -2914,115 +2914,7 @@ function hr(state, startLine, endLine, silent) {
     return true;
 }
 
-// Code block (4 spaces padded)
-function code(state, startLine, endLine /*, silent */) {
-    if (state.sCount[startLine] - state.blkIndent < 4) {
-        return false;
-    }
-    let nextLine = startLine + 1;
-    let last = nextLine;
-    while (nextLine < endLine) {
-        if (state.isEmpty(nextLine)) {
-            nextLine++;
-            continue;
-        }
-        if (state.sCount[nextLine] - state.blkIndent >= 4) {
-            nextLine++;
-            last = nextLine;
-            continue;
-        }
-        break;
-    }
-    state.line = last;
-    const token = state.push('code_block', 'code', 0);
-    token.content = state.getLines(startLine, last, 4 + state.blkIndent, false) + '\n';
-    token.map = [startLine, state.line];
-    return true;
-}
-
-// fences (``` lang, ~~~ lang) 代码块
-function fence(state, startLine, endLine, silent) {
-    let pos = state.bMarks[startLine] + state.tShift[startLine];
-    let max = state.eMarks[startLine];
-    // if it's indented more than 3 spaces, it should be a code block
-    if (state.sCount[startLine] - state.blkIndent >= 4) {
-        return false;
-    }
-    if (pos + 3 > max) {
-        return false;
-    }
-    const marker = state.src.charCodeAt(pos);
-    if (marker !== 0x7E /* ~ */ && marker !== 0x60 /* ` */) {
-        return false;
-    }
-    // scan marker length
-    let mem = pos;
-    pos = state.skipChars(pos, marker);
-    let len = pos - mem;
-    if (len < 3) {
-        return false;
-    }
-    const markup = state.src.slice(mem, pos);
-    const params = state.src.slice(pos, max);
-    if (marker === 0x60 /* ` */) {
-        if (params.indexOf(String.fromCharCode(marker)) >= 0) {
-            return false;
-        }
-    }
-    // Since start is found, we can report success here in validation mode
-    if (silent) {
-        return true;
-    }
-    // search end of block
-    let nextLine = startLine;
-    let haveEndMarker = false;
-    for (;;) {
-        nextLine++;
-        if (nextLine >= endLine) {
-            // unclosed block should be autoclosed by end of document.
-            // also block seems to be autoclosed by end of parent
-            break;
-        }
-        pos = mem = state.bMarks[nextLine] + state.tShift[nextLine];
-        max = state.eMarks[nextLine];
-        if (pos < max && state.sCount[nextLine] < state.blkIndent) {
-            // non-empty line with negative indent should stop the list:
-            // - ```
-            //  test
-            break;
-        }
-        if (state.src.charCodeAt(pos) !== marker) {
-            continue;
-        }
-        if (state.sCount[nextLine] - state.blkIndent >= 4) {
-            // closing fence should be indented less than 4 spaces
-            continue;
-        }
-        pos = state.skipChars(pos, marker);
-        // closing code fence must be at least as long as the opening one
-        if (pos - mem < len) {
-            continue;
-        }
-        // make sure tail has spaces only
-        pos = state.skipSpaces(pos);
-        if (pos < max) {
-            continue;
-        }
-        haveEndMarker = true;
-        // found!
-        break;
-    }
-    // If a fence has heading spaces, they should be removed from its inner block
-    len = state.sCount[startLine];
-    state.line = nextLine + (haveEndMarker ? 1 : 0);
-    const token = state.push('fence', 'code', 0);
-    token.info = params;
-    token.content = state.getLines(startLine + 1, nextLine, len, true);
-    token.markup = markup;
-    token.map = [startLine, state.line];
-    return true;
-}
-
+//解析引用
 function reference(state, startLine, _endLine, silent) {
     let pos = state.bMarks[startLine] + state.tShift[startLine];
     let max = state.eMarks[startLine];
@@ -3225,239 +3117,6 @@ function reference(state, startLine, _endLine, silent) {
     return true;
 }
 
-//块级html元素
-// https://spec.commonmark.org/0.30/#html-blocks
-var block_names = [
-    'address',
-    'article',
-    'aside',
-    'base',
-    'basefont',
-    'blockquote',
-    'body',
-    'caption',
-    'center',
-    'col',
-    'colgroup',
-    'dd',
-    'details',
-    'dialog',
-    'dir',
-    'div',
-    'dl',
-    'dt',
-    'fieldset',
-    'figcaption',
-    'figure',
-    'footer',
-    'form',
-    'frame',
-    'frameset',
-    'h1',
-    'h2',
-    'h3',
-    'head',
-    'header',
-    'hr',
-    'html',
-    'iframe',
-    'legend',
-    'li',
-    'link',
-    'main',
-    'menu',
-    'menuitem',
-    'nav',
-    'noframes',
-    'ol',
-    'optgroup',
-    'option',
-    'p',
-    'param',
-    'search',
-    'section',
-    'summary',
-    'table',
-    'tbody',
-    'td',
-    'tfoot',
-    'th',
-    'thead',
-    'title',
-    'tr',
-    'track',
-    'ul'
-];
-
-// 用于匹配 HTML 标签的正则表达式
-// 属性名称
-const attr_name = '[a-zA-Z_:][a-zA-Z0-9:._-]*';
-// 属性值（未加引号、单引号、双引号）
-const unquoted = '[^"\'=<>`\\x00-\\x20]+';
-const single_quoted = "'[^']*'";
-const double_quoted = '"[^"]*"';
-// 属性值
-const attr_value = '(?:' + unquoted + '|' + single_quoted + '|' + double_quoted + ')';
-// 属性
-const attribute = '(?:\\s+' + attr_name + '(?:\\s*=\\s*' + attr_value + ')?)';
-// 开标签
-const open_tag = '<[A-Za-z][A-Za-z0-9\\-]*' + attribute + '*\\s*\\/?>';
-// 闭标签
-const close_tag = '<\\/[A-Za-z][A-Za-z0-9\\-]*\\s*>';
-// 匹配开标签和闭标签
-const HTML_OPEN_CLOSE_TAG_RE = new RegExp('^(?:' + open_tag + '|' + close_tag + ')');
-
-// HTML block
-// An array of opening and corresponding closing sequences for html tags,
-// last argument defines whether it can terminate a paragraph or not
-//
-const HTML_SEQUENCES = [
-    [
-        /^<(script|pre|style|textarea)(?=(\s|>|$))/i,
-        /<\/(script|pre|style|textarea)>/i,
-        true,
-    ],
-    [/^<!--/, /-->/, true],
-    [/^<\?/, /\?>/, true],
-    [/^<![A-Z]/, />/, true],
-    [/^<!\[CDATA\[/, /\]\]>/, true],
-    [
-        new RegExp("^</?(" + block_names.join("|") + ")(?=(\\s|/?>|$))", "i"),
-        /^$/,
-        true,
-    ],
-    [new RegExp(HTML_OPEN_CLOSE_TAG_RE.source + "\\s*$"), /^$/, false],
-];
-function html_block(state, startLine, endLine, silent) {
-    let pos = state.bMarks[startLine] + state.tShift[startLine];
-    let max = state.eMarks[startLine];
-    // if it's indented more than 3 spaces, it should be a code block
-    if (state.sCount[startLine] - state.blkIndent >= 4) {
-        return false;
-    }
-    if (!state.md.options.html) {
-        return false;
-    }
-    if (state.src.charCodeAt(pos) !== 0x3c /* < */) {
-        return false;
-    }
-    let lineText = state.src.slice(pos, max);
-    let i = 0;
-    for (; i < HTML_SEQUENCES.length; i++) {
-        const sequence = HTML_SEQUENCES[i][0];
-        // 只在 sequence 是 RegExp 时调用 test 方法
-        if (sequence instanceof RegExp && sequence.test(lineText)) {
-            break;
-        }
-    }
-    if (i === HTML_SEQUENCES.length) {
-        return false;
-    }
-    if (silent) {
-        // true if this sequence can be a terminator, false otherwise
-        return HTML_SEQUENCES[i][2];
-    }
-    let nextLine = startLine + 1;
-    // If we are here - we detected HTML block.
-    // Let's roll down till block end.
-    const sequence = HTML_SEQUENCES[i][1];
-    if (sequence instanceof RegExp && !sequence.test(lineText)) {
-        for (; nextLine < endLine; nextLine++) {
-            if (state.sCount[nextLine] < state.blkIndent) {
-                break;
-            }
-            pos = state.bMarks[nextLine] + state.tShift[nextLine];
-            max = state.eMarks[nextLine];
-            lineText = state.src.slice(pos, max);
-            if (sequence instanceof RegExp && sequence.test(lineText)) {
-                if (lineText.length !== 0) {
-                    nextLine++;
-                }
-                break;
-            }
-        }
-    }
-    state.line = nextLine;
-    const token = state.push("html_block", "", 0);
-    token.map = [startLine, nextLine];
-    token.content = state.getLines(startLine, nextLine, state.blkIndent, true);
-    return true;
-}
-
-// lheading (---, ===)
-function lheading(state, startLine, endLine /*, silent */) {
-    const terminatorRules = state.md.block.ruler.getRules("paragraph");
-    // if it's indented more than 3 spaces, it should be a code block
-    if (state.sCount[startLine] - state.blkIndent >= 4) {
-        return false;
-    }
-    const oldParentType = state.parentType;
-    state.parentType = "paragraph"; // use paragraph to match terminatorRules
-    // jump line-by-line until empty one or EOF
-    let level = 0;
-    let marker;
-    let nextLine = startLine + 1;
-    for (; nextLine < endLine && !state.isEmpty(nextLine); nextLine++) {
-        // this would be a code block normally, but after paragraph
-        // it's considered a lazy continuation regardless of what's there
-        if (state.sCount[nextLine] - state.blkIndent > 3) {
-            continue;
-        }
-        //
-        // Check for underline in setext header
-        //
-        if (state.sCount[nextLine] >= state.blkIndent) {
-            let pos = state.bMarks[nextLine] + state.tShift[nextLine];
-            const max = state.eMarks[nextLine];
-            if (pos < max) {
-                marker = state.src.charCodeAt(pos);
-                if (marker === 0x2d /* - */ || marker === 0x3d /* = */) {
-                    pos = state.skipChars(pos, marker);
-                    pos = state.skipSpaces(pos);
-                    if (pos >= max) {
-                        level = marker === 0x3d /* = */ ? 1 : 2;
-                        break;
-                    }
-                }
-            }
-        }
-        // quirk for blockquotes, this line should already be checked by that rule
-        if (state.sCount[nextLine] < 0) {
-            continue;
-        }
-        // Some tags can terminate paragraph without empty line.
-        let terminate = false;
-        for (let i = 0, l = terminatorRules.length; i < l; i++) {
-            if (terminatorRules[i](state, nextLine, endLine, true)) {
-                terminate = true;
-                break;
-            }
-        }
-        if (terminate) {
-            break;
-        }
-    }
-    if (!level) {
-        // Didn't find valid underline
-        return false;
-    }
-    const content = state
-        .getLines(startLine, nextLine, state.blkIndent, false)
-        .trim();
-    state.line = nextLine + 1;
-    const token_o = state.push("heading_open", "h" + String(level), 1);
-    token_o.markup = String.fromCharCode(marker);
-    token_o.map = [startLine, state.line];
-    const token_i = state.push("inline", "", 0);
-    token_i.content = content;
-    token_i.map = [startLine, state.line - 1];
-    token_i.children = [];
-    const token_c = state.push("heading_close", "h" + String(level), -1);
-    token_c.markup = String.fromCharCode(marker);
-    state.parentType = oldParentType;
-    return true;
-}
-
 /** 内部实现
  * class ParserBlock
  *
@@ -3467,8 +3126,6 @@ function lheading(state, startLine, endLine /*, silent */) {
 // 定义核心解析规则
 const _rules$1 = [
     ["table", table, ["paragraph", "reference"]],
-    ["code", code],
-    ["fence", fence, ["paragraph", "reference", "blockquote", "list"]],
     [
         "blockquote",
         blockquote,
@@ -3477,9 +3134,7 @@ const _rules$1 = [
     ["hr", hr, ["paragraph", "reference", "blockquote", "list"]],
     ["list", list, ["paragraph", "reference", "blockquote"]],
     ["reference", reference],
-    ["html_block", html_block, ["paragraph", "reference", "blockquote"]],
     ["heading", heading, ["paragraph", "reference", "blockquote"]],
-    ["lheading", lheading],
     ["paragraph", paragraph],
 ];
 /**
@@ -3711,115 +3366,6 @@ function text(state, silent) {
         state.pending += state.src.slice(state.pos, pos);
     }
     state.pos = pos;
-    return true;
-}
-
-// Process links like https://example.org/
-// RFC3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
-const SCHEME_RE = /(?:^|[^a-z0-9.+-])([a-z][a-z0-9.+-]*)$/i;
-function linkify(state, silent) {
-    if (!state.md.options.linkify)
-        return false;
-    if (state.linkLevel > 0)
-        return false;
-    const pos = state.pos;
-    const max = state.posMax;
-    if (pos + 3 > max)
-        return false;
-    if (state.src.charCodeAt(pos) !== 0x3A /* : */)
-        return false;
-    if (state.src.charCodeAt(pos + 1) !== 0x2F /* / */)
-        return false;
-    if (state.src.charCodeAt(pos + 2) !== 0x2F /* / */)
-        return false;
-    const match = state.pending.match(SCHEME_RE);
-    if (!match)
-        return false;
-    const proto = match[1];
-    const link = state.md.linkify.matchAtStart(state.src.slice(pos - proto.length));
-    if (!link)
-        return false;
-    let url = link.url;
-    // invalid link, but still detected by linkify somehow;
-    // need to check to prevent infinite loop below
-    if (url.length <= proto.length)
-        return false;
-    // disallow '*' at the end of the link (conflicts with emphasis)
-    url = url.replace(/\*+$/, '');
-    const fullUrl = state.md.normalizeLink(url);
-    if (!state.md.validateLink(fullUrl))
-        return false;
-    if (!silent) {
-        state.pending = state.pending.slice(0, -proto.length);
-        const token_o = state.push('link_open', 'a', 1);
-        token_o.attrs = [['href', fullUrl]];
-        token_o.markup = 'linkify';
-        token_o.info = 'auto';
-        const token_t = state.push('text', '', 0);
-        token_t.content = state.md.normalizeLinkText(url);
-        const token_c = state.push('link_close', 'a', -1);
-        token_c.markup = 'linkify';
-        token_c.info = 'auto';
-    }
-    state.pos += url.length - proto.length;
-    return true;
-}
-
-// Process escaped chars and hardbreaks
-//转义字符和硬换行符（\\ 转义符和换行符）
-const ESCAPED = [];
-for (let i = 0; i < 256; i++) {
-    ESCAPED.push(0);
-}
-"\\!\"#$%&'()*+,./:;<=>?@[]^_`{|}~-".split("").forEach(function (ch) {
-    ESCAPED[ch.charCodeAt(0)] = 1;
-});
-function escape(state, silent) {
-    let pos = state.pos;
-    const max = state.posMax;
-    if (state.src.charCodeAt(pos) !== 0x5c /* \ */)
-        return false;
-    pos++;
-    // '\' at the end of the inline block
-    if (pos >= max)
-        return false;
-    let ch1 = state.src.charCodeAt(pos);
-    if (ch1 === 0x0a) {
-        if (!silent) {
-            state.push("hardbreak", "br", 0);
-        }
-        pos++;
-        // skip leading whitespaces from next line
-        while (pos < max) {
-            ch1 = state.src.charCodeAt(pos);
-            if (!isSpace(ch1))
-                break;
-            pos++;
-        }
-        state.pos = pos;
-        return true;
-    }
-    let escapedStr = state.src[pos];
-    if (ch1 >= 0xd800 && ch1 <= 0xdbff && pos + 1 < max) {
-        const ch2 = state.src.charCodeAt(pos + 1);
-        if (ch2 >= 0xdc00 && ch2 <= 0xdfff) {
-            escapedStr += state.src[pos + 1];
-            pos++;
-        }
-    }
-    const origStr = "\\" + escapedStr;
-    if (!silent) {
-        const token = state.push("text_special", "", 0);
-        if (ch1 < 256 && ESCAPED[ch1] !== 0) {
-            token.content = escapedStr;
-        }
-        else {
-            token.content = origStr;
-        }
-        token.markup = origStr;
-        token.info = "escape";
-    }
-    state.pos = pos + 1;
     return true;
 }
 
@@ -4280,53 +3826,6 @@ function image(state, silent) {
     return true;
 }
 
-const DIGITAL_RE = /^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i;
-const NAMED_RE = /^&([a-z][a-z0-9]{1,31});/i;
-function entity(state, silent) {
-    const pos = state.pos;
-    const max = state.posMax;
-    if (state.src.charCodeAt(pos) !== 0x26 /* & */)
-        return false;
-    if (pos + 1 >= max)
-        return false;
-    const ch = state.src.charCodeAt(pos + 1);
-    if (ch === 0x23 /* # */) {
-        const match = state.src.slice(pos).match(DIGITAL_RE);
-        if (match) {
-            if (!silent) {
-                const code = match[1][0].toLowerCase() === "x"
-                    ? parseInt(match[1].slice(1), 16)
-                    : parseInt(match[1], 10);
-                const token = state.push("text_special", "", 0);
-                token.content = isValidEntityCode(code)
-                    ? fromCodePoint(code)
-                    : fromCodePoint(0xfffd);
-                token.markup = match[0];
-                token.info = "entity";
-            }
-            state.pos += match[0].length;
-            return true;
-        }
-    }
-    else {
-        const match = state.src.slice(pos).match(NAMED_RE);
-        if (match) {
-            const decoded = decodeHTML(match[0]);
-            if (decoded !== match[0]) {
-                if (!silent) {
-                    const token = state.push("text_special", "", 0);
-                    token.content = decoded;
-                    token.markup = match[0];
-                    token.info = "entity";
-                }
-                state.pos += match[0].length;
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 // For each opening emphasis-like marker find a matching closing one
 //
 function processDelimiters(delimiters) {
@@ -4433,64 +3932,19 @@ function link_pairs(state) {
     }
 }
 
-// Clean up tokens after emphasis and strikethrough postprocessing:
-// merge adjacent text nodes into one and re-calculate all token levels
-//
-// This is necessary because initially emphasis delimiter markers (*, _, ~)
-// are treated as their own separate text tokens. Then emphasis rule either
-// leaves them as text (needed to merge with adjacent text) or turns them
-// into opening/closing tags (which messes up levels inside).
-//
-function fragments_join(state) {
-    let curr, last;
-    let level = 0;
-    const tokens = state.tokens;
-    const max = state.tokens.length;
-    for (curr = last = 0; curr < max; curr++) {
-        // re-calculate levels after emphasis/strikethrough turns some text nodes
-        // into opening/closing tags
-        if (tokens[curr].nesting < 0)
-            level--; // closing tag
-        tokens[curr].level = level;
-        if (tokens[curr].nesting > 0)
-            level++; // opening tag
-        if (tokens[curr].type === 'text' &&
-            curr + 1 < max &&
-            tokens[curr + 1].type === 'text') {
-            // collapse two adjacent text nodes
-            tokens[curr + 1].content = tokens[curr].content + tokens[curr + 1].content;
-        }
-        else {
-            if (curr !== last) {
-                tokens[last] = tokens[curr];
-            }
-            last++;
-        }
-    }
-    if (curr !== last) {
-        tokens.length = last;
-    }
-}
-
 // 主解析规则
 const _rules = [
     ["text", text], // 跳过普通文本
-    ["linkify", linkify], // 链接识别
-    ["escape", escape], // 识别转义字符
     ["strikethrough", r_strikethrough.tokenize], // 删除线
-    ["emphasis", r_emphasis.tokenize], // 粗体
+    ["emphasis", r_emphasis.tokenize], // 粗体斜体
     ["link", link], // 链接
     ["image", image], // 图片
-    ["entity", entity], // HTML实体，即无法在html中表示的字符
 ];
 //解析成对标签,针对强调和删除线
 const _rules2 = [
     ["balance_pairs", link_pairs],
     ["strikethrough", r_strikethrough.postProcess],
     ["emphasis", r_emphasis.postProcess],
-    // 规则用于将成对的 '**' 分隔成独立的文本标记，这些标记可能会被遗弃，
-    // 下面的规则将未使用的片段重新合并到文本中
-    ["fragments_join", fragments_join],
 ];
 class ParserInline {
     ruler;
