@@ -9,22 +9,17 @@ import StateBlock from "./fsm/state_block.js";
 import { IMarkdown } from "./imd.js";
 import Token from "./token.js";
 
-import r_paragraph from "./rules/block/paragraph.js";
-import r_heading from "./rules/block/heading.js";
-import r_list from "./rules/block/list.js";
-import r_table from "./rules/block/table.js";
-import r_blockquote from "./rules/block/blockquote.js";
-import r_hr from "./rules/block/hr.js";
-import r_code from "./rules/block/code.js";
-import r_fence from "./rules/block/fence.js";
-import r_reference from "./rules/block/reference.js";
-import r_html_block from "./rules/block/html_block.js";
-import r_lheading from "./rules/block/lheading.js";
+import r_paragraph from "./rules/block/paragraph.js"; //段落<p>
+import r_heading from "./rules/block/heading.js"; //标题<h1> <h2>
+import r_list from "./rules/block/list.js"; //列表
+import r_table from "./rules/block/table.js"; //表格
+import r_blockquote from "./rules/block/blockquote.js"; //引用<blockquote>
+import r_hr from "./rules/block/hr.js"; //分割线
+import r_reference from "./rules/block/reference.js"; //解析引用指向
+
 // 定义核心解析规则
 const _rules: [string, Function, string[]?][] = [
   ["table", r_table, ["paragraph", "reference"]],
-  ["code", r_code],
-  ["fence", r_fence, ["paragraph", "reference", "blockquote", "list"]],
   [
     "blockquote",
     r_blockquote,
@@ -33,9 +28,7 @@ const _rules: [string, Function, string[]?][] = [
   ["hr", r_hr, ["paragraph", "reference", "blockquote", "list"]],
   ["list", r_list, ["paragraph", "reference", "blockquote"]],
   ["reference", r_reference],
-  ["html_block", r_html_block, ["paragraph", "reference", "blockquote"]],
   ["heading", r_heading, ["paragraph", "reference", "blockquote"]],
-  ["lheading", r_lheading],
   ["paragraph", r_paragraph],
 ];
 

@@ -1,6 +1,7 @@
 # md-parser
 
-基于 markdown-it 的 Markdown 解析器
+基于 markdown-it 的 Markdown 解析器，配合编辑器效果如下
+<img width="1348" alt="markdown" src="https://github.com/user-attachments/assets/0e23fb99-9d41-409c-a445-18a5993f9d41" />
 
 ## 目录结构
 

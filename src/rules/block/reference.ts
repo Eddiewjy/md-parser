@@ -1,6 +1,6 @@
 import { isSpace, normalizeReference } from "../../common/utils.js";
 import StateBlock from "../../fsm/state_block.js";
-
+//解析引用
 export default function reference(
   state: StateBlock,
   startLine: number,

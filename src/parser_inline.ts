@@ -5,26 +5,19 @@ import Token from "./token.js";
 
 // 基础语法规则
 import r_text from "./rules/inline/text.js";
-import r_linkify from "./rules/inline/linkify.js";
-import r_escape from "./rules/inline/escape.js";
 import r_strikethrough from "./rules/inline/strikethrough.js";
 import r_emphasis from "./rules/inline/emphasis.js";
 import r_link from "./rules/inline/link.js";
 import r_image from "./rules/inline/image.js";
-import r_entity from "./rules/inline/entity.js";
 import r_balance_pairs from "./rules/inline/balance_pairs.js";
-import r_fragments_join from "./rules/inline/fragments_join.js";
 
 // 主解析规则
 const _rules: [string, Function][] = [
   ["text", r_text], // 跳过普通文本
-  ["linkify", r_linkify], // 链接识别
-  ["escape", r_escape], // 识别转义字符
   ["strikethrough", r_strikethrough.tokenize], // 删除线
-  ["emphasis", r_emphasis.tokenize], // 粗体
+  ["emphasis", r_emphasis.tokenize], // 粗体斜体
   ["link", r_link], // 链接
   ["image", r_image], // 图片
-  ["entity", r_entity], // HTML实体，即无法在html中表示的字符
 ];
 
 //解析成对标签,针对强调和删除线
@@ -32,9 +25,6 @@ const _rules2: [string, Function, string[]?][] = [
   ["balance_pairs", r_balance_pairs],
   ["strikethrough", r_strikethrough.postProcess],
   ["emphasis", r_emphasis.postProcess],
-  // 规则用于将成对的 '**' 分隔成独立的文本标记，这些标记可能会被遗弃，
-  // 下面的规则将未使用的片段重新合并到文本中
-  ["fragments_join", r_fragments_join],
 ];
 
 export default class ParserInline {
